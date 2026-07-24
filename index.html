@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>CIPHERX</title>
+<link rel="icon" type="image/png" href="favicon.png"/>
+<link rel="apple-touch-icon" href="favicon.png"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#04020c"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="CIPHERX"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root {
+  --void:      #04020c;
+  --deep:      #0d0520;
+  --purple:    #2a0a4e;
+  --violet:    #6b21c8;
+  --holo:      #9955ff;
+  --holo2:     #7733ee;
+  --blue:      #3355ff;
+  --cyan:      #44aaff;
+  --cyan2:     #22aadd;
+  --fog:       #b066ff;
+  --pink:      #cc44cc;
+  --pink2:     #ff44aa;
+  --gold:      #ffaa44;
+  --panel-bg:      rgba(28, 14, 54, 0.55);
+  --panel-border:  rgba(160, 100, 255, 0.30);
+  --panel-border-h:rgba(160, 100, 255, 0.65);
+  --input-bg:      rgba(10, 4, 26, 0.60);
+  --text:          #e8d8ff;
+  --text-dim:      rgba(210, 170, 255, 0.65);
+  --text-off:      rgba(180, 140, 255, 0.32);
+  --glow-v:        rgba(107,33,200,0.45);
+  --glow-c:        rgba(51,85,255,0.28);
+  --scan-op:       0.08;
+}
+
+html,body{
+  min-height:100%;
+  background: var(--void);
+  font-family:'JetBrains Mono',monospace;
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  position: relative;
+}
+
+#cv-particles{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 18% 28%, rgba(107,33,200,0.20) 0%, transparent 42%),
+    radial-gradient(circle at 82% 72%, rgba(51,85,255,0.15) 0%, transparent 48%),
+    radial-gradient(circle at 55% 15%, rgba(68,170,255,0.08) 0%, transparent 35%),
+    #04020c;
+  animation: bgPulse 14s ease-in-out infinite alternate;
+}
+@keyframes bgPulse {
+  0%   { filter: brightness(1); }
+  50%  { filter: brightness(1.12); }
+  100% { filter: brightness(0.92); }
+}
+
+.scan{
+  position:fixed;inset:0;z-index:3;pointer-events:none;
+  background:repeating-linear-gradient(
+    0deg,transparent,transparent 2px,
+    rgba(0,0,0,var(--scan-op)) 2px,rgba(0,0,0,var(--scan-op)) 3px
+  );
+}
+.vign{
+  position:fixed;inset:0;z-index:3;pointer-events:none;
+  background:radial-gradient(ellipse 85% 85% at 50% 50%,
+    transparent 35%,rgba(4,2,12,0.88) 100%);
+}
+
+#app{
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  padding:50px 16px 64px;
+  position:relative;z-index:10;
+}
+.wrap{width:100%;max-width:500px}
+
+/* ── Title + Glitch ── */
+.title-area{text-align:center;margin-bottom:40px;position:relative}
+
+.glitch-wrap {
+  position: relative;
+  display: inline-block;
+  user-select: none;
+}
+.glitch-wrap::before,
+.glitch-wrap::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0; left: 0;
+  font-family: 'Syne', sans-serif;
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+.glitch-wrap::before {
+  color: var(--cyan);
+  clip-path: polygon(0 18%, 100% 18%, 100% 42%, 0 42%);
+  animation: glitchTop 6s ease-in-out infinite;
+  opacity: 0;
+}
+.glitch-wrap::after {
+  color: var(--pink);
+  clip-path: polygon(0 58%, 100% 58%, 100% 82%, 0 82%);
+  animation: glitchBot 6s ease-in-out infinite;
+  opacity: 0;
+}
+
+.title-mono{
+  font-family:'Syne',sans-serif;
+  font-size:42px;font-weight:800;
+  letter-spacing:0.14em;
+  background: linear-gradient(90deg, var(--holo) 0%, var(--holo) 78%, var(--cyan) 78%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter:
+    drop-shadow(0 0 10px rgba(153,85,255,0.9))
+    drop-shadow(0 0 35px rgba(153,85,255,0.45))
+    drop-shadow(0 0 70px rgba(51,85,255,0.22));
+  display:block;
+  animation: glitchIdle 6s ease-in-out infinite;
+}
+
+@keyframes glitchIdle {
+  0%,87%,100% { transform: none; filter: drop-shadow(0 0 10px rgba(153,85,255,0.9)) drop-shadow(0 0 35px rgba(153,85,255,0.45)); }
+  88%   { transform: translate(-2px, 0) skewX(-1deg); filter: drop-shadow(0 0 18px rgba(153,85,255,1)) brightness(1.3); }
+  89%   { transform: translate(3px, 0) skewX(1.5deg); filter: drop-shadow(0 0 14px rgba(68,170,255,0.9)) hue-rotate(15deg); }
+  90%   { transform: translate(-1px, 1px); filter: drop-shadow(0 0 22px rgba(153,85,255,1)) brightness(1.4); }
+  91%   { transform: none; filter: drop-shadow(0 0 10px rgba(153,85,255,0.9)) drop-shadow(0 0 35px rgba(153,85,255,0.45)); }
+  93%   { transform: translate(2px, -1px) skewX(-1deg); filter: drop-shadow(0 0 16px rgba(204,68,204,0.8)) brightness(1.25); }
+  94%   { transform: none; filter: drop-shadow(0 0 10px rgba(153,85,255,0.9)) drop-shadow(0 0 35px rgba(153,85,255,0.45)); }
+}
+@keyframes glitchTop {
+  0%,87%,95%,100% { opacity:0; transform: none; }
+  88% { opacity:0.80; transform: translate(-5px, 0); }
+  89% { opacity:0.80; transform: translate(5px, 0); }
+  90% { opacity:0; }
+  93% { opacity:0.65; transform: translate(-3px, -1px); }
+  94% { opacity:0; }
+}
+@keyframes glitchBot {
+  0%,87%,95%,100% { opacity:0; transform: none; }
+  88% { opacity:0.65; transform: translate(4px, 0); }
+  89% { opacity:0; }
+  90% { opacity:0.75; transform: translate(-4px, 1px); }
+  91% { opacity:0.4; transform: translate(2px, 0); }
+  92% { opacity:0; }
+}
+
+.glitch-wrap.scrambling .title-mono {
+  animation: glitchBurst 0.08s steps(1) infinite;
+}
+@keyframes glitchBurst {
+  0%   { transform: translate(-3px, 0) skewX(-2deg); filter: drop-shadow(0 0 20px rgba(68,170,255,1)) hue-rotate(30deg) brightness(1.5); }
+  25%  { transform: translate(3px, 1px) skewX(2deg); filter: drop-shadow(0 0 20px rgba(204,68,204,0.9)) hue-rotate(-20deg); }
+  50%  { transform: translate(-1px, -1px); filter: drop-shadow(0 0 24px rgba(153,85,255,1)) brightness(1.6); }
+  75%  { transform: translate(2px, 0) skewX(-1deg); filter: drop-shadow(0 0 18px rgba(68,170,255,0.8)); }
+  100% { transform: none; }
+}
+
+.subtitle{
+  display:block;margin-top:10px;
+  font-size:9px;letter-spacing:0.38em;text-transform:uppercase;
+  color:var(--text-off);
+}
+
+/* ── Card ── */
+.card{
+  background: var(--panel-bg);
+  backdrop-filter: blur(32px) saturate(1.4);
+  -webkit-backdrop-filter: blur(32px) saturate(1.4);
+  border-radius:18px;
+  border:1px solid var(--panel-border);
+  padding:28px 26px 30px;
+  box-shadow:
+    0 0 0 1px rgba(153,85,255,0.08),
+    0 0 70px var(--glow-v),
+    0 0 130px var(--glow-c),
+    0 0 1px rgba(255,255,255,0.06) inset,
+    0 44px 100px rgba(0,0,0,0.80);
+  transition: box-shadow 0.5s ease, border-color 0.5s ease;
+  position:relative;
+  overflow:hidden;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(180,120,255,0.7),rgba(68,170,255,0.45),transparent);
+  pointer-events:none;
+}
+.card::after{
+  content:'';position:absolute;inset:0;
+  background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(153,85,255,0.06) 0%, transparent 70%);
+  pointer-events:none;border-radius:18px;
+}
+.card.mode-dec{
+  border-color:rgba(51,85,255,0.38);
+  box-shadow:
+    0 0 0 1px rgba(51,85,255,0.12),
+    0 0 70px rgba(51,85,255,0.25),
+    0 44px 100px rgba(0,0,0,0.80);
+}
+.card.mode-dec::before{
+  background:linear-gradient(90deg,transparent,rgba(51,85,255,0.55),rgba(68,170,255,0.45),transparent);
+}
+
+.build-tag {
+  position: absolute;top: 14px;right: 16px;
+  font-size: 8px;letter-spacing: 0.14em;
+  color: var(--text-off);font-weight: 700;user-select: none;
+}
+
+/* ── Toggles ── */
+.toggle-container { display:flex;flex-direction:column;gap:12px;margin-bottom:22px; }
+.toggle{
+  width:100%;display:grid;grid-template-columns:1fr 1fr;gap:4px;
+  background:rgba(0,0,0,0.40);border-radius:11px;padding:4px;
+  border:1px solid rgba(153,85,255,0.18);
+}
+.tog-btn{
+  padding:11px 0;border-radius:8px;border:none;cursor:pointer;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;font-weight:700;letter-spacing:0.14em;
+  background:transparent;color:var(--text-dim);
+  transition:all 0.3s cubic-bezier(.4,0,.2,1);
+}
+.tog-btn.on-enc{
+  background:linear-gradient(135deg,#3a0880 0%,#6b21c8 55%,#9955ff 100%);
+  color:#fff;box-shadow:0 0 20px rgba(153,85,255,0.42);
+}
+.tog-btn.on-dec{
+  background:linear-gradient(135deg,#0a1040 0%,#1a2880 55%,#3355ff 100%);
+  color:#fff;box-shadow:0 0 20px rgba(51,85,255,0.42);
+}
+.algo-toggle {
+  display:grid;grid-template-columns:1fr 1fr;gap:4px;
+  background:rgba(0,0,0,0.40);border:1px solid rgba(153,85,255,0.18);
+  border-radius:11px;padding:4px;width:100%;
+}
+.algo-btn {
+  padding:11px 0;border-radius:8px;border:none;cursor:pointer;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;font-weight:700;letter-spacing:0.14em;
+  background:transparent;color:var(--text-dim);transition:all 0.3s ease;
+}
+.algo-btn.active-classic {
+  background:linear-gradient(135deg,var(--purple),var(--holo));
+  color:#fff;box-shadow:0 0 20px rgba(153,85,255,0.4);
+}
+.algo-btn.active-military {
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  color:#fff;box-shadow:0 0 20px rgba(51,85,255,0.4);
+}
+
+/* ── Classic warning ── */
+.algo-warn {
+  display:none;align-items:center;gap:8px;margin-bottom:16px;
+  padding:8px 12px;border-radius:8px;
+  background:rgba(255,170,68,0.07);border:1px solid rgba(255,170,68,0.28);
+  font-size:9px;letter-spacing:0.10em;color:var(--gold);line-height:1.5;
+}
+.algo-warn.visible{display:flex}
+.algo-warn-icon{font-size:12px;flex-shrink:0}
+
+/* ── Labels ── */
+.lbl {
+  display:flex;align-items:center;gap:7px;margin-bottom:9px;
+  font-size:10px;font-weight:700;letter-spacing:0.28em;text-transform:uppercase;
+  color:var(--text-dim);
+}
+.lbl-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--holo);box-shadow:0 0 7px var(--holo);flex-shrink:0;
+}
+.field-wrap{margin-bottom:20px}
+.translit-badge{
+  display:inline-flex;align-items:center;gap:5px;margin-left:auto;
+  font-size:8px;letter-spacing:0.12em;padding:2px 8px;border-radius:10px;
+  background:rgba(68,170,255,0.12);border:1px solid rgba(68,170,255,0.28);
+  color:var(--cyan);opacity:0;transition:opacity 0.3s;
+}
+.translit-badge.visible{opacity:1}
+
+/* ── Fields ── */
+.field {
+  width:100%;padding:14px 18px;border-radius:12px;
+  border:1px solid rgba(153,85,255,0.22);
+  background:var(--input-bg);
+  color:var(--text);font-family:'JetBrains Mono',monospace;
+  font-size:13.5px;letter-spacing:0.05em;
+  outline:none;resize:vertical;min-height:44px;
+  transition:border-color 0.3s,box-shadow 0.3s;caret-color:var(--holo);
+  backdrop-filter: blur(8px);
+}
+.field:focus{border-color:var(--cyan);box-shadow:0 0 18px rgba(68,170,255,0.25)}
+.field::placeholder{color:var(--text-off)}
+textarea.field{line-height:1.75}
+
+/* ── Key row ── */
+.key-row{position:relative}
+.key-row .field{padding-right:46px}
+.eye-btn{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;
+  color:var(--text-dim);font-size:15px;transition:color 0.2s;padding:3px;
+}
+.eye-btn:hover{color:var(--holo)}
+.eye-btn:focus-visible{outline:2px solid var(--holo);border-radius:4px;}
+
+.key-sub{margin-top:8px}
+.key-sub-top{display:flex;justify-content:flex-end;margin-bottom:0}
+.gen-btn{
+  padding:5px 11px;border-radius:7px;border:1px solid rgba(153,85,255,0.22);
+  cursor:pointer;font-family:'JetBrains Mono',monospace;
+  font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;
+  background:transparent;color:var(--text-dim);transition:all 0.22s;
+}
+.gen-btn:hover{border-color:rgba(153,85,255,0.6);color:var(--holo)}
+.gen-btn:focus-visible{outline:2px solid var(--holo);border-radius:6px;}
+
+/* ── Strength bar ── */
+.str-bar-wrap {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.str-bar-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 99px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.str-bar-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 99px;
+  transition: width 0.55s cubic-bezier(0.4,0,0.2,1),
+              background 0.55s ease,
+              box-shadow 0.55s ease;
+  position: relative;
+  background: linear-gradient(90deg, #ff2244, #ff6688);
+  box-shadow: 0 0 8px rgba(255,68,102,0.5);
+}
+.str-bar-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,0.28) 45%,
+    rgba(255,255,255,0.45) 50%,
+    rgba(255,255,255,0.28) 55%,
+    transparent 100%);
+  background-size: 200% 100%;
+  animation: barShimmer 2s linear infinite;
+  border-radius: 99px;
+}
+@keyframes barShimmer {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+.str-bar-pct {
+  font-size: 9px;font-weight: 700;letter-spacing: 0.10em;
+  color: var(--text-off);min-width: 28px;text-align: right;
+  transition: color 0.4s ease;font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── Entropy wrap ── */
+.entropy-wrap{margin-top:10px;display:none}
+.entropy-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.entropy-tag{font-size:9px;color:var(--text-off);letter-spacing:0.10em;text-transform:uppercase}
+.entropy-lbl{font-size:9px;font-weight:700;letter-spacing:0.08em}
+
+/* ── Char count ── */
+.char-count{text-align:right;margin-top:5px;font-size:9px;color:var(--text-off)}
+.char-count.near-limit{color:var(--gold)}
+.char-count.at-limit{color:#ff4466}
+
+/* ── Mode row ── */
+.enc-mode-row{
+  display:flex;align-items:center;gap:8px;margin-bottom:16px;
+  padding:8px 12px;border-radius:8px;
+  background:rgba(136,68,255,0.05);border:1px solid rgba(136,68,255,0.14);
+  font-size:9px;letter-spacing:0.12em;text-transform:uppercase;
+}
+.enc-mode-dot{width:5px;height:5px;border-radius:50%;background:var(--holo);box-shadow:0 0 7px var(--holo);transition:all 0.3s ease}
+.enc-mode-txt{color:var(--text-dim)}
+
+/* ── Buttons ── */
+.btn-row{display:flex;gap:7px}
+.btn-main{
+  flex:1;padding:14px 0;border-radius:11px;border:none;
+  cursor:pointer;font-family:'JetBrains Mono',monospace;
+  font-size:12px;font-weight:700;letter-spacing:0.16em;
+  color:#fff;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#3a0880 0%,#6b21c8 50%,#9955ff 100%);
+  box-shadow:0 0 32px rgba(153,85,255,0.35);transition:all 0.3s ease;
+}
+.btn-main.dec{background:linear-gradient(135deg,#0a1040 0%,#1a2880 50%,#3355ff 100%)}
+.btn-main:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 0 44px rgba(153,85,255,0.58)}
+.btn-main.dec:hover:not(:disabled){box-shadow:0 0 44px rgba(51,85,255,0.58)}
+.btn-main:disabled{background:rgba(255,255,255,0.06);box-shadow:none;cursor:not-allowed;color:rgba(255,255,255,0.20)}
+.btn-main:focus-visible{outline:2px solid var(--holo);outline-offset:2px;}
+.btn-shine{position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.12),transparent 60%)}
+.btn-clr{
+  padding:14px 16px;border-radius:11px;border:1px solid rgba(153,85,255,0.22);
+  cursor:pointer;font-family:'JetBrains Mono',monospace;
+  font-size:10px;font-weight:700;background:transparent;color:var(--text-dim);
+  transition:border-color 0.2s,color 0.2s;
+}
+.btn-clr:hover{border-color:rgba(153,85,255,0.6);color:var(--text)}
+.btn-clr:focus-visible{outline:2px solid var(--holo);border-radius:10px;}
+
+/* ── Output box ── */
+.out-box{
+  margin-top:20px;
+  background:rgba(153,85,255,0.06);
+  border:1px solid rgba(153,85,255,0.28);
+  border-radius:14px;padding:16px;position:relative;overflow:hidden;
+  animation: fadeSlideIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes fadeSlideIn{
+  from{opacity:0;transform:translateY(10px) scale(0.98)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+.out-box.dec{background:rgba(51,85,255,0.06);border-color:rgba(51,85,255,0.30)}
+.out-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.out-lbl{font-size:9px;font-weight:700;letter-spacing:0.26em;color:rgba(153,85,255,0.80)}
+.out-lbl.dec{color:rgba(68,170,255,0.90)}
+.out-acts{display:flex;gap:6px}
+.btn-swap{
+  padding:5px 11px;border-radius:7px;
+  border:1px solid rgba(153,85,255,0.22);
+  background:transparent;color:var(--text-dim);cursor:pointer;
+  transition:border-color 0.2s,color 0.2s;
+}
+.btn-swap:hover{border-color:rgba(153,85,255,0.55);color:var(--holo)}
+.btn-swap:focus-visible{outline:2px solid var(--holo);border-radius:6px;}
+.btn-copy{
+  padding:5px 15px;border-radius:7px;
+  border:1px solid rgba(153,85,255,0.45);
+  background:rgba(153,85,255,0.12);color:var(--holo);
+  cursor:pointer;font-family:'JetBrains Mono',monospace;
+  font-size:10px;font-weight:700;transition:background 0.2s,box-shadow 0.2s;
+}
+.btn-copy:hover{background:rgba(153,85,255,0.24);box-shadow:0 0 14px rgba(153,85,255,0.35)}
+.btn-copy:focus-visible{outline:2px solid var(--holo);border-radius:6px;}
+
+.out-text{
+  font-family:'JetBrains Mono',monospace;font-size:13px;
+  color:var(--text);word-break:break-all;line-height:1.9;
+  letter-spacing:0.07em;user-select:all;
+}
+.out-text.error{color:#ff6688}
+.out-text.typing::after{
+  content:'▌';color:var(--holo);
+  animation:blink 0.7s steps(1) infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── Loading dots ── */
+.dots{display:flex;gap:7px;align-items:center;padding:8px 0}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--holo);animation:bounce 0.85s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0);opacity:.35}50%{transform:translateY(-7px);opacity:1}}
+
+/* ── History ── */
+.hist-section{margin-top:26px}
+.hist-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}
+.hist-title{font-size:9px;font-weight:700;letter-spacing:0.28em;color:var(--text-dim);display:flex;align-items:center;gap:7px}
+.hist-title-dot{width:4px;height:4px;border-radius:50%;background:var(--holo)}
+.hist-clear{font-size:9px;background:none;border:none;color:var(--text-off);cursor:pointer;font-family:'JetBrains Mono',monospace}
+.hist-clear:hover{color:var(--text-dim)}
+.hist-clear:focus-visible{outline:2px solid var(--holo);border-radius:4px;}
+.hist-list{display:flex;flex-direction:column;gap:6px}
+.hist-item{
+  background:rgba(153,85,255,0.04);border:1px solid rgba(153,85,255,0.14);
+  border-radius:9px;padding:10px 13px;
+  cursor:pointer;display:flex;align-items:center;gap:10px;
+  transition:background 0.2s,border-color 0.2s;
+}
+.hist-item:hover{background:rgba(153,85,255,0.09);border-color:rgba(153,85,255,0.26)}
+.hist-item:focus-visible{outline:2px solid var(--holo);border-radius:9px;}
+.hist-badge{font-size:8px;font-weight:700;padding:2px 7px;border-radius:4px}
+.hist-badge.enc{background:rgba(153,85,255,0.22);color:var(--holo)}
+.hist-badge.dec{background:rgba(51,85,255,0.22);color:var(--cyan)}
+.hist-badge.classic-tag{background:rgba(255,170,68,0.18);color:var(--gold)}
+.hist-badge.military-tag{background:rgba(68,170,255,0.18);color:var(--cyan)}
+.hist-preview{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.hist-time{font-size:9px;color:var(--text-off)}
+
+/* ── Keyboard hint ── */
+.kbd-hint{text-align:center;margin-top:10px;font-size:9px;color:var(--text-off);letter-spacing:0.12em}
+.kbd{
+  display:inline-block;padding:1px 5px;border-radius:4px;
+  border:1px solid rgba(153,85,255,0.22);
+  background:rgba(153,85,255,0.05);font-size:8px;
+}
+
+/* ── Toast ── */
+#toast{
+  position:fixed;bottom:34px;left:50%;
+  transform:translateX(-50%) translateY(16px);
+  opacity:0;transition:all 0.38s;
+  background:linear-gradient(135deg,#3a0880,#9955ff);
+  color:#fff;padding:11px 30px;border-radius:40px;
+  font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;z-index:9999;
+  pointer-events:none;
+}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── Footer ── */
+.site-footer{margin-top:34px;padding-top:26px}
+.footer-chips{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.footer-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:20px;
+  border:1px solid rgba(153,85,255,0.18);
+  background:rgba(153,85,255,0.04);
+  font-size:10px;color:var(--text-dim);transition:all 0.25s;
+}
+.footer-chip:hover{border-color:rgba(153,85,255,0.45);background:rgba(153,85,255,0.09)}
+.chip-dot{width:5px;height:5px;border-radius:50%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);display:inline-block;flex-shrink:0}
+.footer-chip:nth-child(even) .chip-dot{background:var(--holo);box-shadow:0 0 6px var(--holo)}
+.footer-sig{
+  text-align:center;padding-top:16px;
+  border-top:1px solid rgba(153,85,255,0.10);
+  font-size:9px;letter-spacing:0.24em;
+  color:rgba(153,85,255,0.28);text-transform:uppercase;user-select:none;
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *,*::before,*::after { animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="cv-particles" aria-hidden="true"></canvas>
+<div class="scan" aria-hidden="true"></div>
+<div class="vign" aria-hidden="true"></div>
+<div id="toast" role="status" aria-live="polite">✦ COPIED</div>
+
+<div id="app">
+<div class="wrap">
+
+  <div class="title-area">
+    <div class="glitch-wrap" id="glitchWrap" data-text="CIPHERX" aria-label="CIPHERX">
+      <span class="title-mono" id="logoText" aria-hidden="true">CIPHERX</span>
+    </div>
+    <span class="subtitle">Secure Cryptosystem · Hybrid Engine</span>
+  </div>
+
+  <div class="card" id="card">
+    <span class="build-tag" aria-hidden="true">v3.2</span>
+
+    <div class="toggle-container">
+      <div class="toggle" role="group" aria-label="Operation mode">
+        <button class="tog-btn on-enc" id="bEnc">ENCRYPT</button>
+        <button class="tog-btn" id="bDec">DECRYPT</button>
+      </div>
+      <div class="algo-toggle" role="group" aria-label="Algorithm">
+        <button class="algo-btn active-classic" id="aClassic">CLASSIC</button>
+        <button class="algo-btn" id="aMilitary">MILITARY</button>
+      </div>
+    </div>
+
+    <div class="algo-warn" id="classicWarn" role="alert">
+      <span class="algo-warn-icon" aria-hidden="true">⚠</span>
+      Classic uses a custom 4-layer cipher with full Unicode support — for learning and casual use. Use Military for sensitive data.
+    </div>
+
+    <div class="enc-mode-row" aria-live="polite">
+      <span class="enc-mode-dot" id="modeDot" aria-hidden="true"></span>
+      <span class="enc-mode-txt" id="modeTxt">Classic Mode (4-Layer · Random Padding) Active</span>
+    </div>
+
+    <div class="field-wrap">
+      <label class="lbl" for="keyInp">
+        <span class="lbl-dot" aria-hidden="true"></span>
+        Secret Key
+        <span class="translit-badge" id="keyBadge" aria-live="polite">Persian Detected</span>
+      </label>
+      <div class="key-row">
+        <input class="field" id="keyInp" type="password"
+               placeholder="enter key..." maxlength="512"
+               autocomplete="off" spellcheck="false"
+               aria-label="Secret key"/>
+        <button class="eye-btn" id="eyeB"
+                aria-label="Show key" aria-pressed="false">◉</button>
+      </div>
+      <div class="key-sub">
+        <div class="key-sub-top">
+          <button class="gen-btn" id="genBtn" aria-label="Generate random key">
+            ⟳ GENERATE
+          </button>
+        </div>
+        <div class="entropy-wrap" id="entropyWrap" aria-live="polite">
+          <div class="entropy-header">
+            <span class="entropy-tag">Key Strength</span>
+            <span class="entropy-lbl" id="entropyLbl"></span>
+          </div>
+          <div class="str-bar-wrap">
+            <div class="str-bar-track" role="progressbar"
+                 aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
+                 aria-label="Key strength">
+              <div class="str-bar-fill" id="strBarFill"></div>
+            </div>
+            <span class="str-bar-pct" id="strBarPct" aria-hidden="true">0%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-wrap">
+      <label class="lbl" for="txtInp">
+        <span class="lbl-dot" style="background:var(--cyan);box-shadow:0 0 7px var(--cyan)" aria-hidden="true"></span>
+        <span id="inLbl">Plaintext</span>
+        <span class="translit-badge" id="txtBadge" aria-live="polite">Persian Detected</span>
+      </label>
+      <textarea class="field" id="txtInp" rows="3"
+                placeholder="your message..."
+                maxlength="10000" spellcheck="false"
+                aria-label="Message input"></textarea>
+      <div class="char-count" id="charCt" aria-live="polite">0 / 10000 chars</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-main" id="mainBtn" disabled>
+        <span class="btn-shine" aria-hidden="true"></span>
+        <span id="mainLbl">ENCRYPT</span>
+      </button>
+      <button class="btn-clr" id="clrBtn" aria-label="Clear all fields">CLR</button>
+    </div>
+
+    <p class="kbd-hint" aria-label="Keyboard shortcut: Control Enter to run">
+      Press <kbd class="kbd">Ctrl</kbd> + <kbd class="kbd">Enter</kbd> to run
+    </p>
+
+    <div id="outBox" style="display:none" class="out-box">
+      <div class="out-hdr">
+        <span class="out-lbl" id="outLbl">✦ ENCRYPTED</span>
+        <div class="out-acts">
+          <button class="btn-swap" id="swapB" aria-label="Swap output to input">⇄</button>
+          <button class="btn-copy" id="copyBtn" aria-label="Copy result to clipboard">COPY ✦</button>
+        </div>
+      </div>
+      <div class="dots" id="dotsEl" style="display:none" aria-hidden="true">
+        <div class="dot" style="animation-delay:0s"></div>
+        <div class="dot" style="animation-delay:.16s"></div>
+        <div class="dot" style="animation-delay:.32s"></div>
+      </div>
+      <div class="out-text" id="outTxt"
+           aria-live="assertive" aria-atomic="true"></div>
+    </div>
+  </div>
+
+  <section class="hist-section" aria-label="Recent operations">
+    <div class="hist-hdr">
+      <span class="hist-title">
+        <span class="hist-title-dot" aria-hidden="true"></span>
+        Recent Operations
+      </span>
+      <button class="hist-clear" id="histClearBtn">CLEAR ALL</button>
+    </div>
+    <div class="hist-list" id="histList" role="list"></div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-chips" aria-label="Features">
+      <span class="footer-chip"><span class="chip-dot" aria-hidden="true"></span>4-Layer Cipher</span>
+      <span class="footer-chip"><span class="chip-dot" aria-hidden="true"></span>PBKDF2 · 600K Rounds</span>
+      <span class="footer-chip"><span class="chip-dot" aria-hidden="true"></span>Client-Side Only</span>
+      <span class="footer-chip"><span class="chip-dot" aria-hidden="true"></span>Never Persisted</span>
+      <span class="footer-chip"><span class="chip-dot" aria-hidden="true"></span>Persian Support</span>
+      <span class="footer-chip"><span class="chip-dot" aria-hidden="true"></span>AES-GCM-256</span>
+    </div>
+    <div class="footer-sig">CIPHERX · Personal Encryption System</div>
+  </footer>
+
+</div>
+</div>
+
+<script>
+'use strict';
+
+// ─────────────────────────────────────────────
+//  INLINE WEB WORKER — Classic 4-Layer Crypto
+//  Runs off main thread; UI never freezes
+// ─────────────────────────────────────────────
+const _WORKER_SRC = `
+'use strict';
+// 95 printable ASCII (space=32 … tilde=126) — no hardcoded backtick needed
+const ALLOWED_CHARS = Array.from({length:95},(_,i)=>String.fromCharCode(i+32)).join('');
+const N = 95;
+
+// ── UTF-8 safe base64 (handles Persian/emoji/any Unicode) ──
+function textToB64(str){
+  const bytes = new TextEncoder().encode(str);
+  return btoa(Array.from(bytes, b => String.fromCharCode(b)).join(''));
+}
+function b64ToText(b64){
+  const bin = atob(b64);
+  return new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0)));
+}
+
+// ── Key derivation ──
+function getSecureSeed(keyStr){
+  let h1=0x85ebca6b, h2=0xc2b2ae35;
+  for(let i=0;i<keyStr.length;i++){
+    const c=keyStr.charCodeAt(i);
+    h1=Math.imul(h1^c,2654435761);
+    h2=Math.imul(h2^c,1597334677);
+  }
+  for(let r=0;r<60000;r++){
+    h1=Math.imul(h1^(h2>>>15),0x45d9f3b);
+    h2=Math.imul(h2^(h1>>>16),0x45d9f3b);
+  }
+  return(h1^h2)>>>0;
+}
+function makeRng(seed){
+  let r=seed>>>0;
+  return()=>{r^=r<<13;r^=r>>17;r^=r<<5;return(r>>>0)/4294967296;};
+}
+function getStream(key,length,salt){
+  const rand=makeRng(getSecureSeed(key+salt));
+  return Array.from({length},()=>Math.floor(rand()*N));
+}
+function getPermutation(key,length){
+  const rand=makeRng(getSecureSeed(key+':perm'));
+  const idx=Array.from({length},(_,i)=>i);
+  for(let i=length-1;i>0;i--){
+    const j=Math.floor(rand()*(i+1));
+    [idx[i],idx[j]]=[idx[j],idx[i]];
+  }
+  return idx;
+}
+
+// ── Layer 4: Feistel-style mixing ──
+// Each character depends on its mirror across the midpoint → non-linear
+function feistelMix(arr, ks, fwd){
+  const len=arr.length, half=Math.floor(len/2), r=[...arr];
+  if(fwd){
+    // Pass A: right half absorbs left half
+    for(let i=0;i<half;i++){
+      const j=len-1-i;
+      r[j]=(r[j]+r[i]+((ks[i]^ks[j])%N))%N;
+    }
+    // Pass B: left half absorbs (now-modified) right half
+    for(let i=0;i<half;i++){
+      const j=len-1-i;
+      const mv=(ks[i+half]!==undefined?ks[i+half]:ks[i])%N;
+      r[i]=(r[i]+r[j]+mv)%N;
+    }
+  } else {
+    // Undo Pass B first
+    for(let i=half-1;i>=0;i--){
+      const j=len-1-i;
+      const mv=(ks[i+half]!==undefined?ks[i+half]:ks[i])%N;
+      r[i]=((r[i]-r[j]-mv)%N+N)%N;
+    }
+    // Undo Pass A
+    for(let i=half-1;i>=0;i--){
+      const j=len-1-i;
+      r[j]=((r[j]-r[i]-((ks[i]^ks[j])%N))%N+N)%N;
+    }
+  }
+  return r;
+}
+
+function randByte(){
+  const a=new Uint8Array(1);
+  crypto.getRandomValues(a);
+  return a[0];
+}
+
+// ── Classic Encrypt: b64(text) → L1 → L2 → L3 → L4 → ciphertext ──
+function encryptClassic(plain, key){
+  const encoded = textToB64(plain);          // Unicode → base64 (all ASCII)
+  const padLen  = (randByte() % 5) + 1;      // 1..5 random pad chars
+  let pad = '';
+  for(let i=0;i<padLen-1;i++) pad += ALLOWED_CHARS[randByte() % N];
+  pad += ALLOWED_CHARS[padLen];              // meta char encodes padLen
+  const src = encoded + pad;
+  const len = src.length;
+
+  const s1=getStream(key,len,':L1-sub');
+  const s2=getStream(key,len,':L2-mix');
+  const s3=getStream(key,len,':L3-sub');
+  const s4=getStream(key,len,':L4-fst');
+  const p =getPermutation(key,len);
+
+  // L1: Substitution (additive stream cipher)
+  let idx = Array.from(src, c => {
+    const i = ALLOWED_CHARS.indexOf(c);
+    return (i < 0 ? 0 : i);
+  });
+  idx = idx.map((v,i) => (v+s1[i])%N);
+
+  // L2: Transposition (key-driven permutation)
+  const pm = new Array(len);
+  for(let i=0;i<len;i++) pm[p[i]] = idx[i];
+  idx = pm;
+
+  // L3: Second substitution (independent keystream)
+  idx = idx.map((v,i) => (v+s3[i])%N);
+
+  // L4: Feistel mixing (inter-character dependency)
+  idx = feistelMix(idx, s2.map((v,i) => v^s4[i]), true);
+
+  return idx.map(i => ALLOWED_CHARS[i]).join('');
+}
+
+// ── Classic Decrypt: reverse of each layer ──
+function decryptClassic(ciph, key){
+  const len = ciph.length;
+  const s1=getStream(key,len,':L1-sub');
+  const s2=getStream(key,len,':L2-mix');
+  const s3=getStream(key,len,':L3-sub');
+  const s4=getStream(key,len,':L4-fst');
+  const p =getPermutation(key,len);
+
+  let idx = Array.from(ciph, c => {
+    const i = ALLOWED_CHARS.indexOf(c);
+    return i < 0 ? 0 : i;
+  });
+
+  // Undo L4
+  idx = feistelMix(idx, s2.map((v,i) => v^s4[i]), false);
+  // Undo L3
+  idx = idx.map((v,i) => ((v-s3[i])%N+N)%N);
+  // Undo L2
+  const up = new Array(len);
+  for(let i=0;i<len;i++) up[i] = idx[p[i]];
+  idx = up;
+  // Undo L1
+  idx = idx.map((v,i) => ((v-s1[i])%N+N)%N);
+
+  const res = idx.map(i => ALLOWED_CHARS[i]).join('');
+
+  // Strip padding: last char's index = padLen
+  const padLen = ALLOWED_CHARS.indexOf(res[res.length-1]);
+  if(padLen < 1 || padLen > 5 || padLen > res.length)
+    throw new Error('Wrong key or corrupted ciphertext');
+
+  try {
+    return b64ToText(res.slice(0, res.length - padLen));
+  } catch {
+    throw new Error('Wrong key or corrupted ciphertext');
+  }
+}
+
+// ── Worker message handler ──
+self.onmessage = function(e){
+  const {id, action, key, txt} = e.data;
+  try {
+    const result = action === 'encrypt'
+      ? encryptClassic(txt, key)
+      : decryptClassic(txt, key);
+    self.postMessage({id, result});
+  } catch(err) {
+    self.postMessage({id, error: err.message});
+  }
+};
+`;
+
+// ── Spawn worker from blob (no external file needed) ──
+const _worker = new Worker(
+  URL.createObjectURL(new Blob([_WORKER_SRC], {type:'text/javascript'}))
+);
+const _workerCbs = new Map();
+let _msgId = 0;
+
+_worker.onmessage = ({data:{id,result,error}}) => {
+  const cb = _workerCbs.get(id);
+  if(cb){ _workerCbs.delete(id); error ? cb.reject(new Error(error)) : cb.resolve(result); }
+};
+_worker.onerror = () => {
+  _workerCbs.forEach(cb => cb.reject(new Error('Worker crashed')));
+  _workerCbs.clear();
+};
+
+function callWorker(action, key, txt){
+  return new Promise((resolve, reject) => {
+    const id = ++_msgId;
+    _workerCbs.set(id, {resolve, reject});
+    _worker.postMessage({id, action, key, txt});
+  });
+}
+
+// ─────────────────────────────────────────────
+//  STATE & CONSTANTS
+// ─────────────────────────────────────────────
+const state = {
+  mode:    'enc',
+  algo:    'classic',
+  output:  '',
+  showKey: false,
+};
+const opHistory = [];   // FIX: was `history` — shadowed window.history
+const MAX_CHARS  = 10000;
+
+// ─────────────────────────────────────────────
+//  MILITARY CRYPTO  (main thread — Web Crypto)
+//  Already fully async; no UI blocking
+// ─────────────────────────────────────────────
+function _u8ToB64(bytes){
+  // FIX: Array.from avoids String.fromCharCode.apply stack overflow
+  return btoa(Array.from(bytes, b => String.fromCharCode(b)).join(''));
+}
+
+async function encryptMilitary(plain, pass){
+  const enc  = new TextEncoder();
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv   = crypto.getRandomValues(new Uint8Array(12));
+  const bk   = await crypto.subtle.importKey('raw', enc.encode(pass), 'PBKDF2', false, ['deriveKey']);
+  const ak   = await crypto.subtle.deriveKey(
+    {name:'PBKDF2', salt, iterations:600000, hash:'SHA-256'},
+    bk, {name:'AES-GCM', length:256}, false, ['encrypt']
+  );
+  const ct  = new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv}, ak, enc.encode(plain)));
+  const out = new Uint8Array(16 + 12 + ct.length);
+  out.set(salt, 0); out.set(iv, 16); out.set(ct, 28);
+  return _u8ToB64(out);
+}
+
+async function decryptMilitary(b64, pass){
+  const enc = new TextEncoder();
+  const dec = new TextDecoder();
+  const bin = atob(b64);
+  const all = Uint8Array.from(bin, c => c.charCodeAt(0));   // FIX: no apply
+  const bk  = await crypto.subtle.importKey('raw', enc.encode(pass), 'PBKDF2', false, ['deriveKey']);
+  const ak  = await crypto.subtle.deriveKey(
+    {name:'PBKDF2', salt:all.slice(0,16), iterations:600000, hash:'SHA-256'},
+    bk, {name:'AES-GCM', length:256}, false, ['decrypt']
+  );
+  return dec.decode(await crypto.subtle.decrypt({name:'AES-GCM', iv:all.slice(16,28)}, ak, all.slice(28)));
+}
+
+// ─────────────────────────────────────────────
+//  PARTICLE SYSTEM
+// ─────────────────────────────────────────────
+(function(){
+  const canvas = document.getElementById('cv-particles');
+  const ctx    = canvas.getContext('2d');
+  let W, H, particles = [];
+  const COLORS = ['rgba(153,85,255,','rgba(68,170,255,','rgba(180,80,255,','rgba(51,85,255,','rgba(200,120,255,'];
+
+  function resize(){ W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+
+  function Particle(){
+    this.x  = Math.random()*W; this.y  = Math.random()*H;
+    this.vx = (Math.random()-.5)*.35; this.vy = (Math.random()-.5)*.35;
+    this.r  = Math.random()*1.6+.5;
+    this.col = COLORS[Math.floor(Math.random()*COLORS.length)];
+    this.baseOp = Math.random()*.5+.2;
+    this.phase  = Math.random()*Math.PI*2;
+    this.speed  = Math.random()*.012+.005;
+  }
+
+  function init(){
+    const n = Math.min(90, Math.floor(W*H/14000));
+    particles = Array.from({length:n}, () => new Particle());
+  }
+
+  let t = 0;
+  function draw(){
+    ctx.clearRect(0,0,W,H); t += .008;
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if(p.x < -5) p.x = W+5; if(p.x > W+5) p.x = -5;
+      if(p.y < -5) p.y = H+5; if(p.y > H+5) p.y = -5;
+      const op = p.baseOp * (.6 + .4*Math.sin(t*p.speed*60+p.phase));
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle = p.col+op+')'; ctx.fill();
+    });
+    for(let i=0;i<particles.length;i++){
+      for(let j=i+1;j<particles.length;j++){
+        const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        if(d<110){
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x,particles[i].y);
+          ctx.lineTo(particles[j].x,particles[j].y);
+          ctx.strokeStyle='rgba(130,70,255,'+(1-d/110)*.18+')';
+          ctx.lineWidth=.6; ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { resize(); init(); });
+  resize(); init(); draw();
+})();
+
+// ─────────────────────────────────────────────
+//  TYPEWRITER EFFECT
+// ─────────────────────────────────────────────
+let _twTimer = null;
+function typewriterEffect(el, text){
+  clearTimeout(_twTimer);
+  el.textContent = ''; el.classList.add('typing');
+  let i = 0;
+  if(text.length > 180){
+    const chunk = Math.ceil(text.length/60);
+    (function tick(){
+      if(i >= text.length){ el.classList.remove('typing'); return; }
+      el.textContent = text.slice(0, i+chunk); i += chunk;
+      _twTimer = setTimeout(tick, 14);
+    })();
+  } else {
+    const spd = text.length > 80 ? 8 : 22;
+    (function tick(){
+      if(i >= text.length){ el.classList.remove('typing'); return; }
+      el.textContent = text.slice(0, ++i);
+      _twTimer = setTimeout(tick, spd);
+    })();
+  }
+}
+
+// ─────────────────────────────────────────────
+//  LOGO SCRAMBLE
+// ─────────────────────────────────────────────
+const _SCRAMBLE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*!?';
+const _LOGO     = 'CIPHERX';
+let _scramTimer = null;
+
+function triggerLogoScramble(){
+  const el   = document.getElementById('logoText');
+  const wrap = document.getElementById('glitchWrap');
+  if(!el || !wrap) return;
+  clearTimeout(_scramTimer);
+  wrap.classList.add('scrambling');
+  let frame = 0; const total = 18;
+  (function tick(){
+    const rev = Math.floor(frame/total * _LOGO.length);
+    el.textContent = Array.from(_LOGO, (_,i) =>
+      i < rev ? _LOGO[i] : _SCRAMBLE[Math.floor(Math.random()*_SCRAMBLE.length)]
+    ).join('');
+    frame++;
+    if(frame <= total) _scramTimer = setTimeout(tick, 42);
+    else { el.textContent = _LOGO; wrap.classList.remove('scrambling'); }
+  })();
+}
+
+// ─────────────────────────────────────────────
+//  UTILITIES
+// ─────────────────────────────────────────────
+function hasFarsi(str){ return /[\u0600-\u06FF]/.test(str); }
+
+// ─────────────────────────────────────────────
+//  UI — MODE & ALGO SWITCHES
+// ─────────────────────────────────────────────
+function setAlgo(a){
+  state.algo = a;
+  const ac   = document.getElementById('aClassic');
+  const am   = document.getElementById('aMilitary');
+  const mt   = document.getElementById('modeTxt');
+  const md   = document.getElementById('modeDot');
+  const warn = document.getElementById('classicWarn');
+
+  if(a === 'classic'){
+    ac.className = 'algo-btn active-classic';
+    am.className = 'algo-btn';
+    mt.textContent = 'Classic Mode (4-Layer · Random Padding) Active';
+    md.style.cssText = 'background:var(--holo);box-shadow:0 0 7px var(--holo)';
+    warn.classList.add('visible');
+  } else {
+    ac.className = 'algo-btn';
+    am.className = 'algo-btn active-military';
+    mt.textContent = 'Military Grade Mode (AES-GCM-256 · 600K PBKDF2) Active';
+    md.style.cssText = 'background:var(--cyan);box-shadow:0 0 7px var(--cyan)';
+    warn.classList.remove('visible');
+  }
+  // FIX: removed auto go() call — switching algo no longer silently re-runs
+}
+
+function setMode(m){
+  state.mode = m; state.output = '';
+  document.getElementById('outBox').style.display = 'none';
+  const card = document.getElementById('card');
+  const be   = document.getElementById('bEnc');
+  const bd   = document.getElementById('bDec');
+  const ml   = document.getElementById('mainLbl');
+  const il   = document.getElementById('inLbl');
+  const mb   = document.getElementById('mainBtn');
+
+  if(m === 'enc'){
+    be.className='tog-btn on-enc'; bd.className='tog-btn';
+    card.className='card'; ml.textContent='ENCRYPT';
+    il.textContent='Plaintext'; mb.className='btn-main';
+    mb.setAttribute('aria-label','Encrypt message');
+  } else {
+    be.className='tog-btn'; bd.className='tog-btn on-dec';
+    card.className='card mode-dec'; ml.textContent='DECRYPT';
+    il.textContent='Ciphertext'; mb.className='btn-main dec';
+    mb.setAttribute('aria-label','Decrypt message');
+  }
+  updateBtn();
+}
+
+// ─────────────────────────────────────────────
+//  UI — FIELD HANDLERS
+// ─────────────────────────────────────────────
+function onKey(){
+  const k = document.getElementById('keyInp').value;
+  document.getElementById('keyBadge').className =
+    'translit-badge' + (hasFarsi(k) ? ' visible' : '');
+
+  if(!k){
+    document.getElementById('entropyWrap').style.display = 'none';
+    updateBtn(); return;
+  }
+  document.getElementById('entropyWrap').style.display = 'block';
+
+  // Score: length (40pts) + charset variety (4×15pts)
+  // FIX: Persian chars count as alphabetic (no longer transliterated away)
+  let score = Math.min(40, k.length * 3.5);
+  if(/[a-z\u0600-\u06FF]/u.test(k)) score += 15;
+  if(/[A-Z]/.test(k))                score += 15;
+  if(/[0-9]/.test(k))                score += 15;
+  if(/[^A-Za-z0-9\u0600-\u06FF]/u.test(k)) score += 15;
+  score = Math.min(100, Math.round(score));
+
+  const bar  = document.getElementById('strBarFill');
+  const pct  = document.getElementById('strBarPct');
+  const lbl  = document.getElementById('entropyLbl');
+  const prog = document.querySelector('.str-bar-track');
+
+  bar.style.width = score + '%';
+  if(prog) prog.setAttribute('aria-valuenow', score);
+  if(pct)  pct.textContent = score + '%';
+
+  if(score < 40){
+    bar.style.background  = 'linear-gradient(90deg,#cc0022,#ff2244,#ff6688)';
+    bar.style.boxShadow   = '0 0 10px rgba(255,34,68,.65),0 0 20px rgba(255,34,68,.25)';
+    if(pct) pct.style.color = '#ff4466';
+    if(lbl){ lbl.textContent = 'WEAK'; lbl.style.color = '#ff4466'; }
+  } else if(score < 75){
+    bar.style.background  = 'linear-gradient(90deg,#0033cc,#1155ff,#33aaff,#44ddff)';
+    bar.style.boxShadow   = '0 0 10px rgba(51,170,255,.65),0 0 20px rgba(51,170,255,.25)';
+    if(pct) pct.style.color = 'var(--cyan)';
+    if(lbl){ lbl.textContent = 'STRONG'; lbl.style.color = 'var(--cyan)'; }
+  } else {
+    bar.style.background  = 'linear-gradient(90deg,#4400aa,#7733ee,#9955ff,#cc88ff,#44aaff)';
+    bar.style.boxShadow   = '0 0 12px rgba(153,85,255,.75),0 0 24px rgba(153,85,255,.30)';
+    if(pct) pct.style.color = 'var(--holo)';
+    if(lbl){ lbl.textContent = 'UNBREAKABLE'; lbl.style.color = 'var(--holo)'; }
+  }
+  updateBtn();
+}
+
+function onTxt(){
+  const t  = document.getElementById('txtInp').value;
+  const ct = document.getElementById('charCt');
+  ct.textContent = t.length + ' / ' + MAX_CHARS + ' chars';
+  ct.className   = 'char-count' +
+    (t.length >= MAX_CHARS ? ' at-limit' : t.length > MAX_CHARS * .85 ? ' near-limit' : '');
+  document.getElementById('txtBadge').className =
+    'translit-badge' + (hasFarsi(t) ? ' visible' : '');
+  updateBtn();
+}
+
+function updateBtn(){
+  const k = document.getElementById('keyInp').value.trim();
+  const t = document.getElementById('txtInp').value.trim();
+  document.getElementById('mainBtn').disabled = !(k && t);
+}
+
+// ─────────────────────────────────────────────
+//  MAIN OPERATION
+// ─────────────────────────────────────────────
+async function go(){
+  const key = document.getElementById('keyInp').value;
+  const txt = document.getElementById('txtInp').value;
+  if(!key.trim() || !txt.trim()) return;
+
+  triggerLogoScramble();
+
+  const ob = document.getElementById('outBox');
+  const de = document.getElementById('dotsEl');
+  const ot = document.getElementById('outTxt');
+  const mb = document.getElementById('mainBtn');
+  const ml = document.getElementById('mainLbl');
+  const ol = document.getElementById('outLbl');
+
+  ob.style.display = ''; de.style.display = 'flex';
+  ot.textContent = ''; ot.className = 'out-text';
+  mb.disabled = true; ml.textContent = 'PROCESSING...';
+  ol.className = 'out-lbl' + (state.mode === 'dec' ? ' dec' : '');
+  ob.className  = 'out-box' + (state.mode === 'dec' ? ' dec' : '');
+
+  let res, isError = false;
+  try {
+    if(state.algo === 'classic'){
+      // Classic runs in Web Worker — main thread stays responsive
+      res = await callWorker(state.mode === 'enc' ? 'encrypt' : 'decrypt', key, txt);
+    } else {
+      // Military uses native async Web Crypto — also non-blocking
+      res = state.mode === 'enc'
+        ? await encryptMilitary(txt, key)
+        : await decryptMilitary(txt, key);
+    }
+  } catch(e){
+    res = 'Decryption failed — wrong key or corrupted ciphertext';
+    isError = true;
+  }
+
+  state.output = isError ? '' : res;
+  de.style.display = 'none';
+  mb.disabled = false;
+  ml.textContent = state.mode === 'enc' ? 'ENCRYPT' : 'DECRYPT';
+  ol.textContent  = isError ? '✦ ERROR' : (state.mode === 'enc' ? '✦ ENCRYPTED' : '✦ DECRYPTED');
+
+  if(isError){
+    ot.textContent = res;
+    ot.className   = 'out-text error';
+  } else {
+    ot.className = 'out-text';
+    typewriterEffect(ot, res);
+    addHist(state.mode, res);
+  }
+}
+
+// ─────────────────────────────────────────────
+//  ACTIONS
+// ─────────────────────────────────────────────
+function clearAll(){
+  document.getElementById('keyInp').value = '';
+  document.getElementById('txtInp').value = '';
+  document.getElementById('outBox').style.display = 'none';
+  document.getElementById('entropyWrap').style.display = 'none';
+  const bar = document.getElementById('strBarFill');
+  const pct = document.getElementById('strBarPct');
+  if(bar){ bar.style.width = '0%'; bar.style.boxShadow = 'none'; }
+  if(pct){ pct.textContent = '0%'; pct.style.color = ''; }
+  state.output = '';
+  onTxt(); updateBtn();
+}
+
+function toggleEye(){
+  state.showKey = !state.showKey;
+  const inp = document.getElementById('keyInp');
+  const btn = document.getElementById('eyeB');
+  inp.type  = state.showKey ? 'text' : 'password';
+  btn.textContent = state.showKey ? '◎' : '◉';
+  btn.setAttribute('aria-label',  state.showKey ? 'Hide key' : 'Show key');
+  btn.setAttribute('aria-pressed', state.showKey);
+}
+
+function genKey(){
+  // FIX: proper crypto random — UUID had fixed-structure entropy loss
+  const bytes = crypto.getRandomValues(new Uint8Array(18));
+  document.getElementById('keyInp').value =
+    Array.from(bytes, b => b.toString(16).padStart(2,'0')).join('').slice(0, 24);
+  onKey();
+}
+
+function doCopy(){
+  if(!state.output) return;
+  const show = () => {
+    const t = document.getElementById('toast');
+    t.classList.add('on');
+    setTimeout(() => t.classList.remove('on'), 1500);
+  };
+  // Clipboard API with execCommand fallback
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(state.output).then(show).catch(() => {
+      _execCopy(state.output); show();
+    });
+  } else {
+    _execCopy(state.output); show();
+  }
+}
+function _execCopy(text){
+  const ta = Object.assign(document.createElement('textarea'), {value:text});
+  ta.style.cssText = 'position:fixed;left:-9999px;opacity:0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); } finally { ta.remove(); }
+}
+
+function doSwap(){
+  if(!state.output) return;
+  document.getElementById('txtInp').value = state.output;
+  state.output = '';
+  onTxt();
+  setMode(state.mode === 'enc' ? 'dec' : 'enc');
+  document.getElementById('outBox').style.display = 'none';
+}
+
+// ─────────────────────────────────────────────
+//  HISTORY
+// ─────────────────────────────────────────────
+function addHist(m, full){
+  const now = new Date();
+  const time = now.getHours().toString().padStart(2,'0') + ':' +
+               now.getMinutes().toString().padStart(2,'0');
+  opHistory.unshift({ m, algo:state.algo, preview:full.slice(0,28), full, time });
+  if(opHistory.length > 4) opHistory.pop();
+  renderHist();
+}
+
+function renderHist(){
+  const list = document.getElementById('histList');
+  // FIX: pure DOM manipulation — no innerHTML with user data (XSS prevention)
+  list.innerHTML = '';
+  opHistory.forEach(h => {
+    const item = document.createElement('div');
+    item.className = 'hist-item';
+    item.setAttribute('role', 'listitem');
+    item.setAttribute('tabindex', '0');
+    item.setAttribute('aria-label', h.m.toUpperCase() + ' at ' + h.time);
+
+    const activate = () => {
+      document.getElementById('txtInp').value = h.full;
+      onTxt();
+    };
+    item.addEventListener('click', activate);
+    item.addEventListener('keydown', e => {
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); activate(); }
+    });
+
+    const b1 = document.createElement('span');
+    b1.className   = 'hist-badge ' + h.m;
+    b1.textContent = h.m.toUpperCase();
+
+    const b2 = document.createElement('span');
+    b2.className   = 'hist-badge ' + (h.algo === 'military' ? 'military-tag' : 'classic-tag');
+    b2.textContent = h.algo.toUpperCase();
+
+    const prev = document.createElement('span');
+    prev.className   = 'hist-preview';
+    prev.textContent = h.preview;   // textContent: XSS-safe
+
+    const tm = document.createElement('span');
+    tm.className   = 'hist-time';
+    tm.textContent = h.time;
+
+    item.append(b1, b2, prev, tm);
+    list.appendChild(item);
+  });
+}
+
+function clearHist(){
+  opHistory.splice(0);
+  renderHist();
+}
+
+// ─────────────────────────────────────────────
+//  INIT — wire up all events here, no inline handlers in HTML
+// ─────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('bEnc').addEventListener('click', () => setMode('enc'));
+  document.getElementById('bDec').addEventListener('click', () => setMode('dec'));
+  document.getElementById('aClassic').addEventListener('click', () => setAlgo('classic'));
+  document.getElementById('aMilitary').addEventListener('click', () => setAlgo('military'));
+  document.getElementById('eyeB').addEventListener('click', toggleEye);
+  document.getElementById('genBtn').addEventListener('click', genKey);
+  document.getElementById('keyInp').addEventListener('input', onKey);
+  document.getElementById('txtInp').addEventListener('input', onTxt);
+  document.getElementById('mainBtn').addEventListener('click', go);
+  document.getElementById('clrBtn').addEventListener('click', clearAll);
+  document.getElementById('swapB').addEventListener('click', doSwap);
+  document.getElementById('copyBtn').addEventListener('click', doCopy);
+  document.getElementById('histClearBtn').addEventListener('click', clearHist);
+
+  // Ctrl/Cmd + Enter shortcut
+  document.addEventListener('keydown', e => {
+    if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
+      e.preventDefault();
+      const mb = document.getElementById('mainBtn');
+      if(!mb.disabled) go();
+    }
+  });
+
+  document.getElementById('classicWarn').classList.add('visible');
+});
+
+// ─── Service Worker (PWA) ───
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () =>
+    navigator.serviceWorker.register('/sw.js').catch(() => {})
+  );
+}
+</script>
+</body>
+</html>
