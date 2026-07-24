@@ -2,7 +2,7 @@
   "name": "CIPHERX",
   "short_name": "CIPHERX",
   "description": "Secure Cryptosystem · Hybrid Engine",
-  "start_url": "/",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#04020c",
   "theme_color": "#04020c",
