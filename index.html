@@ -114,9 +114,9 @@ body::before {
   position: absolute;
   top: 0; left: 0;
   font-family: 'Syne', sans-serif;
-  font-size: 44px;
+  font-size: 30px;
   font-weight: 800;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.08em;
   width: 100%; height: 100%;
   pointer-events: none;
   overflow: hidden;
@@ -136,8 +136,9 @@ body::before {
 
 .title-mono{
   font-family:'Syne',sans-serif;
-  font-size:44px;font-weight:800;
-  letter-spacing:0.16em;
+  font-size:30px;font-weight:800;
+  letter-spacing:0.08em;
+  margin-right:-0.08em;
   background: linear-gradient(90deg, #9955ff 0%, #44aaff 50%, #ff44aa 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -328,12 +329,12 @@ body::before {
 
 /* ── Fields (ENHANCED PLACEHOLDER COLOR) ── */
 .field {
-  width:100%;padding:14px 18px;border-radius:12px;
+  width:100%;padding:11px 16px;border-radius:12px;
   border:1px solid rgba(153,85,255,0.22);
   background:var(--input-bg);
   color:var(--text);font-family:'JetBrains Mono',monospace;
   font-size:13.5px;letter-spacing:0.05em;
-  outline:none;resize:vertical;min-height:44px;
+  outline:none;resize:vertical;min-height:40px;
   transition:border-color 0.3s,box-shadow 0.3s;caret-color:var(--holo);
   backdrop-filter: blur(8px);
 }
@@ -342,7 +343,7 @@ body::before {
   color: rgba(210, 170, 255, 0.60); /* Brighter & more vivid hint text */
   font-weight: 400;
 }
-textarea.field{line-height:1.75}
+textarea.field{line-height:1.4}
 
 /* ── Dropzone (File & Stego) ── */
 .dropzone {
@@ -678,7 +679,7 @@ textarea.field{line-height:1.75}
         <span class="translit-badge" id="txtBadge" aria-live="polite">Persian Detected</span>
       </label>
       <!-- SECURITY #4: Anti-autofill attributes -->
-      <textarea class="field" id="txtInp" rows="3"
+      <textarea class="field" id="txtInp" rows="2"
                 placeholder="your message..." maxlength="10000"
                 autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-lpignore="true"
                 aria-label="Message input"></textarea>
@@ -1034,8 +1035,7 @@ async function saveFileNative(data, fileName, mimeType) {
     return;
   }
 
-  const { Filesystem, Directory } = window.Capacitor.Plugins;
-  const { Share } = window.Capacitor.Plugins;
+  const { Filesystem, Share } = window.Capacitor.Plugins;
 
   const base64Data = data instanceof Uint8Array
     ? btoa(Array.from(data, b => String.fromCharCode(b)).join(''))
@@ -1044,7 +1044,7 @@ async function saveFileNative(data, fileName, mimeType) {
   const result = await Filesystem.writeFile({
     path: fileName,
     data: base64Data,
-    directory: Directory.Cache
+    directory: 'CACHE'
   });
 
   await Share.share({ title: fileName, url: result.uri });
