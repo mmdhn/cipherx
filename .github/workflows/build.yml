@@ -43,7 +43,7 @@ jobs:
           cp favicon.png www/ 2>/dev/null || true
           cp manifest.json www/ 2>/dev/null || true
           npm init -y
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/filesystem @capacitor/share
           npx cap init CIPHERX com.cipherx.app --web-dir www
           npx cap add android
 
