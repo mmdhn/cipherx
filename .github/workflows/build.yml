@@ -1,0 +1,102 @@
+name: Build CIPHERX APK
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      release_notes:
+        description: 'توضیحات این نسخه (اختیاری - خالی بذاری از پیام commit استفاده می‌شه)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build Android project via Capacitor
+        run: |
+          mkdir -p www
+          cp index.html www/
+          cp favicon.png www/ 2>/dev/null || true
+          cp manifest.json www/ 2>/dev/null || true
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npx cap init CIPHERX com.cipherx.app --web-dir www
+          npx cap add android
+
+          cat >> android/build.gradle << 'EOF'
+          allprojects {
+              configurations.all {
+                  exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+                  exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+              }
+          }
+          EOF
+
+          # ── ساخت آیکون واقعی اندروید از روی favicon.png ──
+          mkdir -p assets
+          cp favicon.png assets/icon.png
+          npm install @capacitor/assets --save-dev
+          npx capacitor-assets generate --android
+
+          npx cap sync
+
+      - name: Decode signing keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/cipherx.keystore
+
+      - name: Configure release signing
+        run: |
+          cat >> android/app/build.gradle << 'EOF'
+          android {
+              signingConfigs {
+                  release {
+                      storeFile file("cipherx.keystore")
+                      storePassword System.getenv("KEYSTORE_PASSWORD")
+                      keyAlias System.getenv("KEY_ALIAS")
+                      keyPassword System.getenv("KEY_PASSWORD")
+                  }
+              }
+              buildTypes {
+                  release {
+                      signingConfig signingConfigs.release
+                  }
+              }
+          }
+          EOF
+
+      - name: Build Release APK
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: CIPHERX v1.0.${{ github.run_number }}
+          body: ${{ github.event.inputs.release_notes || github.event.head_commit.message || 'به‌روزرسانی جدید' }}
+          files: android/app/build/outputs/apk/release/app-release.apk
