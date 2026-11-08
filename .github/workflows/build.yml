@@ -42,10 +42,15 @@ jobs:
           cp index.html www/
           cp favicon.png www/ 2>/dev/null || true
           cp manifest.json www/ 2>/dev/null || true
+          # favicon داخل APK لازم نیست ۱.۷ مگابایت باشه (آیکون اصلی جدا از assets/icon.png ساخته می‌شه)
+          (convert favicon.png -resize 256x256 www/favicon.png 2>/dev/null || magick favicon.png -resize 256x256 www/favicon.png 2>/dev/null) || true
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/filesystem @capgo/capacitor-file-sharer
           npx cap init CIPHERX com.cipherx.app --web-dir www
           npx cap add android
+
+          # ── جلوگیری از backup خودکار دیتای اپ ──
+          sed -i 's/android:allowBackup="true"/android:allowBackup="false"/' android/app/src/main/AndroidManifest.xml
 
           # ── تعیین شماره‌ی نسخه: دستی (اگه وارد شده) یا خودکار ──
           if [ -n "$VERSION_INPUT" ]; then

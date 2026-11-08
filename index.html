@@ -2,1688 +2,390 @@
 <html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="color-scheme" content="dark light"/>
 <title>CIPHERX</title>
-
-<!-- SECURITY #4: Content Security Policy Meta Tag -->
-<meta http-equiv="Content-Security-Policy" 
-      content="default-src 'self' 'unsafe-inline' blob: data: https://fonts.googleapis.com https://fonts.gstatic.com; img-src 'self' blob: data:;"/>
-
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' blob: data:; img-src 'self' blob: data:;"/>
 <link rel="icon" type="image/png" href="favicon.png"/>
 <link rel="apple-touch-icon" href="favicon.png"/>
 <link rel="manifest" href="manifest.json"/>
-<meta name="theme-color" content="#04020c"/>
+<meta name="theme-color" content="#0b0817"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="CIPHERX"/>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
-:root {
-  --void:      #04020c;
-  --deep:      #0d0520;
-  --purple:    #2a0a4e;
-  --violet:    #6b21c8;
-  --holo:      #9955ff;
-  --holo2:     #7733ee;
-  --blue:      #3355ff;
-  --cyan:      #44aaff;
-  --cyan2:     #22aadd;
-  --fog:       #b066ff;
-  --pink:      #cc44cc;
-  --pink2:     #ff44aa;
-  --gold:      #ffaa44;
-  --panel-bg:      rgba(28, 14, 54, 0.55);
-  --panel-border:  rgba(160, 100, 255, 0.30);
-  --panel-border-h:rgba(160, 100, 255, 0.65);
-  --input-bg:      rgba(10, 4, 26, 0.60);
-  --text:          #e8d8ff;
-  --text-dim:      rgba(210, 170, 255, 0.75);
-  --text-off:      rgba(210, 170, 255, 0.45);
-  --glow-v:        rgba(107,33,200,0.45);
-  --glow-c:        rgba(51,85,255,0.28);
-  --scan-op:       0.08;
-}
-
-html,body{
-  min-height:100%;
-  background: var(--void);
-  font-family:'JetBrains Mono',monospace;
-  color:var(--text);
-  -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
-  position: relative;
-}
-
-#cv-particles{position:fixed;inset:0;z-index:0;pointer-events:none}
-
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background:
-    radial-gradient(circle at 18% 28%, rgba(107,33,200,0.22) 0%, transparent 42%),
-    radial-gradient(circle at 82% 72%, rgba(51,85,255,0.18) 0%, transparent 48%),
-    radial-gradient(circle at 55% 15%, rgba(68,170,255,0.10) 0%, transparent 35%),
-    #04020c;
-  animation: bgPulse 14s ease-in-out infinite alternate;
-}
-@keyframes bgPulse {
-  0%   { filter: brightness(1); }
-  50%  { filter: brightness(1.12); }
-  100% { filter: brightness(0.92); }
-}
-
-.scan{
-  position:fixed;inset:0;z-index:3;pointer-events:none;
-  background:repeating-linear-gradient(
-    0deg,transparent,transparent 2px,
-    rgba(0,0,0,var(--scan-op)) 2px,rgba(0,0,0,var(--scan-op)) 3px
-  );
-}
-.vign{
-  position:fixed;inset:0;z-index:3;pointer-events:none;
-  background:radial-gradient(ellipse 85% 85% at 50% 50%,
-    transparent 35%,rgba(4,2,12,0.88) 100%);
-}
-
-#app{
-  min-height:100vh;
-  display:flex;align-items:center;justify-content:center;
-  padding:50px 16px 64px;
-  position:relative;z-index:10;
-}
-.wrap{width:100%;max-width:540px}
-
-/* ── Title + Glitch (ENHANCED GRADIENT & GLOW) ── */
-.title-area{text-align:center;margin-bottom:35px;position:relative}
-
-.glitch-wrap {
-  position: relative;
-  display: inline-block;
-  user-select: none;
-}
-.glitch-wrap::before,
-.glitch-wrap::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0; left: 0;
-  font-family: 'Syne', sans-serif;
-  font-size: 30px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  width: 100%; height: 100%;
-  pointer-events: none;
-  overflow: hidden;
-}
-.glitch-wrap::before {
-  color: var(--cyan);
-  clip-path: polygon(0 18%, 100% 18%, 100% 42%, 0 42%);
-  animation: glitchTop 6s ease-in-out infinite;
-  opacity: 0;
-}
-.glitch-wrap::after {
-  color: var(--pink2);
-  clip-path: polygon(0 58%, 100% 58%, 100% 82%, 0 82%);
-  animation: glitchBot 6s ease-in-out infinite;
-  opacity: 0;
-}
-
-.title-mono{
-  font-family:'Syne',sans-serif;
-  font-size:30px;font-weight:800;
-  letter-spacing:0.08em;
-  margin-right:-0.08em;
-  background: linear-gradient(90deg, #9955ff 0%, #44aaff 50%, #ff44aa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter:
-    drop-shadow(0 0 12px rgba(153,85,255,0.9))
-    drop-shadow(0 0 30px rgba(68,170,255,0.6))
-    drop-shadow(0 0 50px rgba(255,68,170,0.4));
-  display:block;
-  animation: glitchIdle 6s ease-in-out infinite;
-}
-
-@keyframes glitchIdle {
-  0%,87%,100% { transform: none; }
-  88%   { transform: translate(-2px, 0) skewX(-1deg); filter: drop-shadow(0 0 18px rgba(153,85,255,1)) brightness(1.3); }
-  89%   { transform: translate(3px, 0) skewX(1.5deg); filter: drop-shadow(0 0 14px rgba(68,170,255,0.9)) hue-rotate(15deg); }
-  90%   { transform: translate(-1px, 1px); filter: drop-shadow(0 0 22px rgba(255,68,170,1)) brightness(1.4); }
-  91%   { transform: none; }
-  93%   { transform: translate(2px, -1px) skewX(-1deg); filter: drop-shadow(0 0 16px rgba(204,68,204,0.8)) brightness(1.25); }
-  94%   { transform: none; }
-}
-@keyframes glitchTop {
-  0%,87%,95%,100% { opacity:0; transform: none; }
-  88% { opacity:0.80; transform: translate(-5px, 0); }
-  89% { opacity:0.80; transform: translate(5px, 0); }
-  90% { opacity:0; }
-  93% { opacity:0.65; transform: translate(-3px, -1px); }
-  94% { opacity:0; }
-}
-@keyframes glitchBot {
-  0%,87%,95%,100% { opacity:0; transform: none; }
-  88% { opacity:0.65; transform: translate(4px, 0); }
-  89% { opacity:0; }
-  90% { opacity:0.75; transform: translate(-4px, 1px); }
-  91% { opacity:0.4; transform: translate(2px, 0); }
-  92% { opacity:0; }
-}
-
-.glitch-wrap.scrambling .title-mono {
-  animation: glitchBurst 0.08s steps(1) infinite;
-}
-@keyframes glitchBurst {
-  0%   { transform: translate(-3px, 0) skewX(-2deg); filter: drop-shadow(0 0 20px rgba(68,170,255,1)) hue-rotate(30deg) brightness(1.5); }
-  25%  { transform: translate(3px, 1px) skewX(2deg); filter: drop-shadow(0 0 20px rgba(204,68,204,0.9)) hue-rotate(-20deg); }
-  50%  { transform: translate(-1px, -1px); filter: drop-shadow(0 0 24px rgba(153,85,255,1)) brightness(1.6); }
-  75%  { transform: translate(2px, 0) skewX(-1deg); filter: drop-shadow(0 0 18px rgba(68,170,255,0.8)); }
-  100% { transform: none; }
-}
-
-.subtitle{
-  display:block;margin-top:10px;
-  font-size:9px;letter-spacing:0.38em;text-transform:uppercase;
-  color:var(--text-off);
-}
-
-/* ── Card ── */
-.card{
-  background: var(--panel-bg);
-  backdrop-filter: blur(32px) saturate(1.4);
-  -webkit-backdrop-filter: blur(32px) saturate(1.4);
-  border-radius:18px;
-  border:1px solid var(--panel-border);
-  padding:28px 26px 30px;
-  box-shadow:
-    0 0 0 1px rgba(153,85,255,0.08),
-    0 0 70px var(--glow-v),
-    0 0 130px var(--glow-c),
-    0 0 1px rgba(255,255,255,0.06) inset,
-    0 44px 100px rgba(0,0,0,0.80);
-  transition: box-shadow 0.5s ease, border-color 0.5s ease;
-  position:relative;
-  overflow:hidden;
-}
-.card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(180,120,255,0.7),rgba(68,170,255,0.45),transparent);
-  pointer-events:none;
-}
-.card::after{
-  content:'';position:absolute;inset:0;
-  background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(153,85,255,0.06) 0%, transparent 70%);
-  pointer-events:none;border-radius:18px;
-}
-.card.mode-dec{
-  border-color:rgba(51,85,255,0.38);
-  box-shadow:
-    0 0 0 1px rgba(51,85,255,0.12),
-    0 0 70px rgba(51,85,255,0.25),
-    0 44px 100px rgba(0,0,0,0.80);
-}
-.card.mode-dec::before{
-  background:linear-gradient(90deg,transparent,rgba(51,85,255,0.55),rgba(68,170,255,0.45),transparent);
-}
-
-.build-tag {
-  position: absolute;top: 14px;right: 16px;
-  font-size: 8px;letter-spacing: 0.14em;
-  color: var(--text-off);font-weight: 700;user-select: none;
-}
-
-/* ── Input Mode Tabs ── */
-.input-tabs {
-  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;
-  background: rgba(0,0,0,0.45); border-radius: 11px; padding: 4px;
-  border: 1px solid rgba(153,85,255,0.18); margin-bottom: 16px;
-}
-.tab-btn {
-  padding: 8px 0; border-radius: 8px; border: none; cursor: pointer;
-  font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700;
-  letter-spacing: 0.10em; background: transparent; color: var(--text-dim);
-  transition: all 0.3s ease;
-}
-.tab-btn.active {
-  background: linear-gradient(135deg, var(--purple), var(--holo));
-  color: #fff; box-shadow: 0 0 16px rgba(153,85,255,0.4);
-}
-
-/* ── Toggles ── */
-.toggle-container { display:flex;flex-direction:column;gap:12px;margin-bottom:22px; }
-.toggle{
-  width:100%;display:grid;grid-template-columns:1fr 1fr;gap:4px;
-  background:rgba(0,0,0,0.40);border-radius:11px;padding:4px;
-  border:1px solid rgba(153,85,255,0.18);
-}
-.tog-btn{
-  padding:11px 0;border-radius:8px;border:none;cursor:pointer;
-  font-family:'JetBrains Mono',monospace;
-  font-size:11px;font-weight:700;letter-spacing:0.14em;
-  background:transparent;color:var(--text-dim);
-  transition:all 0.3s cubic-bezier(.4,0,.2,1);
-}
-.tog-btn.on-enc{
-  background:linear-gradient(135deg,#3a0880 0%,#6b21c8 55%,#9955ff 100%);
-  color:#fff;box-shadow:0 0 20px rgba(153,85,255,0.42);
-}
-.tog-btn.on-dec{
-  background:linear-gradient(135deg,#0a1040 0%,#1a2880 55%,#3355ff 100%);
-  color:#fff;box-shadow:0 0 20px rgba(51,85,255,0.42);
-}
-.algo-toggle {
-  display:grid;grid-template-columns:1fr 1fr;gap:4px;
-  background:rgba(0,0,0,0.40);border:1px solid rgba(153,85,255,0.18);
-  border-radius:11px;padding:4px;width:100%;
-}
-.algo-btn {
-  padding:11px 0;border-radius:8px;border:none;cursor:pointer;
-  font-family:'JetBrains Mono',monospace;
-  font-size:11px;font-weight:700;letter-spacing:0.14em;
-  background:transparent;color:var(--text-dim);transition:all 0.3s ease;
-}
-.algo-btn.active-classic {
-  background:linear-gradient(135deg,var(--purple),var(--holo));
-  color:#fff;box-shadow:0 0 20px rgba(153,85,255,0.4);
-}
-.algo-btn.active-military {
-  background:linear-gradient(135deg,var(--blue),var(--cyan));
-  color:#fff;box-shadow:0 0 20px rgba(51,85,255,0.4);
-}
-
-/* ── Classic warning ── */
-.algo-warn {
-  display:none;align-items:center;gap:8px;margin-bottom:16px;
-  padding:8px 12px;border-radius:8px;
-  background:rgba(255,170,68,0.07);border:1px solid rgba(255,170,68,0.28);
-  font-size:9px;letter-spacing:0.10em;color:var(--gold);line-height:1.5;
-}
-.algo-warn.visible{display:flex}
-.algo-warn-icon{font-size:12px;flex-shrink:0}
-
-/* ── Labels ── */
-.lbl {
-  display:flex;align-items:center;gap:7px;margin-bottom:9px;
-  font-size:10px;font-weight:700;letter-spacing:0.28em;text-transform:uppercase;
-  color:var(--text-dim);
-}
-.lbl-dot{
-  width:5px;height:5px;border-radius:50%;
-  background:var(--holo);box-shadow:0 0 7px var(--holo);flex-shrink:0;
-}
-.field-wrap{margin-bottom:20px}
-.translit-badge{
-  display:inline-flex;align-items:center;gap:5px;margin-left:auto;
-  font-size:8px;letter-spacing:0.12em;padding:2px 8px;border-radius:10px;
-  background:rgba(68,170,255,0.12);border:1px solid rgba(68,170,255,0.28);
-  color:var(--cyan);opacity:0;transition:opacity 0.3s;
-}
-.translit-badge.visible{opacity:1}
-
-/* ── Fields (ENHANCED PLACEHOLDER COLOR) ── */
-.field {
-  width:100%;padding:11px 16px;border-radius:12px;
-  border:1px solid rgba(153,85,255,0.22);
-  background:var(--input-bg);
-  color:var(--text);font-family:'JetBrains Mono',monospace;
-  font-size:13.5px;letter-spacing:0.05em;
-  outline:none;resize:vertical;min-height:40px;
-  transition:border-color 0.3s,box-shadow 0.3s;caret-color:var(--holo);
-  backdrop-filter: blur(8px);
-}
-.field:focus{border-color:var(--cyan);box-shadow:0 0 18px rgba(68,170,255,0.25)}
-.field::placeholder{
-  color: rgba(210, 170, 255, 0.60); /* Brighter & more vivid hint text */
-  font-weight: 400;
-}
-textarea.field{line-height:1.4}
-
-/* ── Dropzone (File & Stego) ── */
-.dropzone {
-  border: 2px dashed rgba(153,85,255,0.30); border-radius: 12px; padding: 22px 16px;
-  text-align: center; background: rgba(10,4,26,0.40); cursor: pointer; transition: all 0.3s;
-}
-.dropzone:hover { border-color: var(--cyan); background: rgba(68,170,255,0.06); }
-.drop-icon { font-size: 26px; display: block; margin-bottom: 6px; }
-.drop-txt { font-size: 11px; color: var(--text-dim); }
-
-/* ── Key row ── */
-.key-row{position:relative}
-.key-row .field{padding-right:46px}
-.eye-btn{
-  position:absolute;right:14px;top:50%;transform:translateY(-50%);
-  background:none;border:none;cursor:pointer;
-  color:var(--text-dim);font-size:15px;transition:color 0.2s;padding:3px;
-}
-.eye-btn:hover{color:var(--holo)}
-.eye-btn:focus-visible{outline:2px solid var(--holo);border-radius:4px;}
-
-.key-sub{margin-top:8px}
-.key-sub-top{display:flex;justify-content:flex-end;margin-bottom:0}
-.gen-btn{
-  padding:5px 11px;border-radius:7px;border:1px solid rgba(153,85,255,0.22);
-  cursor:pointer;font-family:'JetBrains Mono',monospace;
-  font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;
-  background:transparent;color:var(--text-dim);transition:all 0.22s;
-}
-.gen-btn:hover{border-color:rgba(153,85,255,0.6);color:var(--holo)}
-.gen-btn:focus-visible{outline:2px solid var(--holo);border-radius:6px;}
-
-/* ── Strength bar ── */
-.str-bar-wrap {
-  margin-top: 10px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.str-bar-track {
-  flex: 1;
-  height: 4px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 99px;
-  overflow: hidden;
-  position: relative;
-  border: 1px solid rgba(255,255,255,0.06);
-}
-.str-bar-fill {
-  height: 100%;
-  width: 0%;
-  border-radius: 99px;
-  transition: width 0.55s cubic-bezier(0.4,0,0.2,1),
-              background 0.55s ease,
-              box-shadow 0.55s ease;
-  position: relative;
-  background: linear-gradient(90deg, #ff2244, #ff6688);
-  box-shadow: 0 0 8px rgba(255,68,102,0.5);
-}
-.str-bar-fill::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(255,255,255,0.28) 45%,
-    rgba(255,255,255,0.45) 50%,
-    rgba(255,255,255,0.28) 55%,
-    transparent 100%);
-  background-size: 200% 100%;
-  animation: barShimmer 2s linear infinite;
-  border-radius: 99px;
-}
-@keyframes barShimmer {
-  0%   { background-position: 200% center; }
-  100% { background-position: -200% center; }
-}
-.str-bar-pct {
-  font-size: 9px;font-weight: 700;letter-spacing: 0.10em;
-  color: var(--text-off);min-width: 28px;text-align: right;
-  transition: color 0.4s ease;font-family: 'JetBrains Mono', monospace;
-}
-
-/* ── Entropy wrap ── */
-.entropy-wrap{margin-top:10px;display:none}
-.entropy-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.entropy-tag{font-size:9px;color:var(--text-off);letter-spacing:0.10em;text-transform:uppercase}
-.entropy-lbl{font-size:9px;font-weight:700;letter-spacing:0.08em}
-
-/* ── Char count ── */
-.char-count{text-align:right;margin-top:5px;font-size:9px;color:var(--text-off)}
-.char-count.near-limit{color:var(--gold)}
-.char-count.at-limit{color:#ff4466}
-
-/* ── Mode row ── */
-.enc-mode-row{
-  display:flex;align-items:center;gap:8px;margin-bottom:16px;
-  padding:8px 12px;border-radius:8px;
-  background:rgba(136,68,255,0.05);border:1px solid rgba(136,68,255,0.14);
-  font-size:9px;letter-spacing:0.12em;text-transform:uppercase;
-}
-.enc-mode-dot{width:5px;height:5px;border-radius:50%;background:var(--holo);box-shadow:0 0 7px var(--holo);transition:all 0.3s ease}
-.enc-mode-txt{color:var(--text-dim)}
-
-/* ── Buttons ── */
-.btn-row{display:flex;gap:7px}
-.btn-main{
-  flex:1;padding:14px 0;border-radius:11px;border:none;
-  cursor:pointer;font-family:'JetBrains Mono',monospace;
-  font-size:12px;font-weight:700;letter-spacing:0.16em;
-  color:#fff;position:relative;overflow:hidden;
-  background:linear-gradient(135deg,#3a0880 0%,#6b21c8 50%,#9955ff 100%);
-  box-shadow:0 0 32px rgba(153,85,255,0.35);transition:all 0.3s ease;
-}
-.btn-main.dec{background:linear-gradient(135deg,#0a1040 0%,#1a2880 50%,#3355ff 100%)}
-.btn-main:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 0 44px rgba(153,85,255,0.58)}
-.btn-main.dec:hover:not(:disabled){box-shadow:0 0 44px rgba(51,85,255,0.58)}
-.btn-main:disabled{background:rgba(255,255,255,0.06);box-shadow:none;cursor:not-allowed;color:rgba(255,255,255,0.20)}
-.btn-main:focus-visible{outline:2px solid var(--holo);outline-offset:2px;}
-.btn-shine{position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.12),transparent 60%)}
-.btn-clr{
-  padding:14px 16px;border-radius:11px;border:1px solid rgba(153,85,255,0.22);
-  cursor:pointer;font-family:'JetBrains Mono',monospace;
-  font-size:10px;font-weight:700;background:transparent;color:var(--text-dim);
-  transition:border-color 0.2s,color 0.2s;
-}
-.btn-clr:hover{border-color:rgba(153,85,255,0.6);color:var(--text)}
-.btn-clr:focus-visible{outline:2px solid var(--holo);border-radius:10px;}
-
-/* ── Output box ── */
-.out-box{
-  margin-top:20px;
-  background:rgba(153,85,255,0.06);
-  border:1px solid rgba(153,85,255,0.28);
-  border-radius:14px;padding:16px;position:relative;overflow:hidden;
-  animation: fadeSlideIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
-}
-@keyframes fadeSlideIn{
-  from{opacity:0;transform:translateY(10px) scale(0.98)}
-  to{opacity:1;transform:translateY(0) scale(1)}
-}
-.out-box.dec{background:rgba(51,85,255,0.06);border-color:rgba(51,85,255,0.30)}
-.out-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:6px}
-.out-lbl{font-size:9px;font-weight:700;letter-spacing:0.26em;color:rgba(153,85,255,0.80)}
-.out-lbl.dec{color:rgba(68,170,255,0.90)}
-.out-acts{display:flex;gap:5px;flex-wrap:wrap}
-.btn-act{
-  padding:5px 9px;border-radius:7px;
-  border:1px solid rgba(153,85,255,0.22);
-  background:transparent;color:var(--text-dim);cursor:pointer;
-  font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;
-  transition:border-color 0.2s,color 0.2s,background 0.2s;
-}
-.btn-act:hover{border-color:rgba(153,85,255,0.55);color:var(--holo);background:rgba(153,85,255,0.1)}
-.btn-copy{
-  padding:5px 12px;border-radius:7px;
-  border:1px solid rgba(153,85,255,0.45);
-  background:rgba(153,85,255,0.12);color:var(--holo);
-  cursor:pointer;font-family:'JetBrains Mono',monospace;
-  font-size:9px;font-weight:700;transition:background 0.2s,box-shadow 0.2s;
-}
-.btn-copy:hover{background:rgba(153,85,255,0.24);box-shadow:0 0 14px rgba(153,85,255,0.35)}
-
-.out-text{
-  font-family:'JetBrains Mono',monospace;font-size:13px;
-  color:var(--text);word-break:break-all;line-height:1.9;
-  letter-spacing:0.07em;user-select:all;
-}
-.out-text.error{color:#ff6688}
-.out-text.typing::after{
-  content:'▌';color:var(--holo);
-  animation:blink 0.7s steps(1) infinite;
-}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-
-/* ── Loading dots ── */
-.dots{display:flex;gap:7px;align-items:center;padding:8px 0}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--holo);animation:bounce 0.85s ease-in-out infinite}
-@keyframes bounce{0%,100%{transform:translateY(0);opacity:.35}50%{transform:translateY(-7px);opacity:1}}
-
-/* ── History ── */
-.hist-section{margin-top:26px}
-.hist-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}
-.hist-title{font-size:9px;font-weight:700;letter-spacing:0.28em;color:var(--text-dim);display:flex;align-items:center;gap:7px}
-.hist-title-dot{width:4px;height:4px;border-radius:50%;background:var(--holo)}
-.hist-clear{font-size:9px;background:none;border:none;color:var(--text-off);cursor:pointer;font-family:'JetBrains Mono',monospace}
-.hist-clear:hover{color:var(--text-dim)}
-.hist-list{display:flex;flex-direction:column;gap:6px}
-.hist-item{
-  background:rgba(153,85,255,0.04);border:1px solid rgba(153,85,255,0.14);
-  border-radius:9px;padding:10px 13px;
-  cursor:pointer;display:flex;align-items:center;gap:10px;
-  transition:background 0.2s,border-color 0.2s;
-}
-.hist-item:hover{background:rgba(153,85,255,0.09);border-color:rgba(153,85,255,0.26)}
-.hist-badge{font-size:8px;font-weight:700;padding:2px 7px;border-radius:4px}
-.hist-badge.enc{background:rgba(153,85,255,0.22);color:var(--holo)}
-.hist-badge.dec{background:rgba(51,85,255,0.22);color:var(--cyan)}
-.hist-badge.classic-tag{background:rgba(255,170,68,0.18);color:var(--gold)}
-.hist-badge.military-tag{background:rgba(68,170,255,0.18);color:var(--cyan)}
-.hist-preview{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
-.hist-time{font-size:9px;color:var(--text-off)}
-
-/* ── Keyboard hint ── */
-.kbd-hint{text-align:center;margin-top:10px;font-size:9px;color:var(--text-off);letter-spacing:0.12em}
-.kbd{
-  display:inline-block;padding:1px 5px;border-radius:4px;
-  border:1px solid rgba(153,85,255,0.22);
-  background:rgba(153,85,255,0.05);font-size:8px;
-}
-
-/* ── Toast ── */
-#toast{
-  position:fixed;bottom:34px;left:50%;
-  transform:translateX(-50%) translateY(16px);
-  opacity:0;transition:all 0.38s;
-  background:linear-gradient(135deg,#3a0880,#9955ff);
-  color:#fff;padding:11px 30px;border-radius:40px;
-  font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;z-index:9999;
-  pointer-events:none;
-}
+:root{--bg:#0b0817;--card:#15102a;--in:#0e0a1f;--bd:#2c2350;--tx:#ece6ff;--dim:#a99ccc;--ac:#8b5cf6;--ac2:#3b82f6;--ok:#34d399;--bad:#f87171;--warn:#fbbf24;color-scheme:dark}
+[data-theme=light]{--bg:#f5f3ff;--card:#fff;--in:#f1edff;--bd:#d9d2f3;--tx:#1d1538;--dim:#5f5584;--ac:#6d3be0;--ac2:#2563eb;color-scheme:light}
+html,body{min-height:100%;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Tahoma,sans-serif;-webkit-font-smoothing:antialiased}
+body{background:radial-gradient(circle at 15% 0,rgba(139,92,246,.18),transparent 45%),radial-gradient(circle at 90% 100%,rgba(59,130,246,.14),transparent 45%),var(--bg);padding:max(16px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom))}
+.wrap{max-width:560px;margin:0 auto}
+header{display:flex;align-items:center;justify-content:space-between;margin:8px 0 20px}
+h1{font:800 26px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;background:linear-gradient(90deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{font-size:12px;color:var(--dim);margin-top:4px}
+.hb{display:flex;gap:8px}
+.ib{min-width:44px;min-height:44px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:700 13px inherit;cursor:pointer}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:18px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+.seg{display:grid;gap:4px;background:var(--in);border:1px solid var(--bd);border-radius:14px;padding:4px;margin-bottom:12px}
+.seg.c3{grid-template-columns:repeat(3,1fr)}.seg.c2{grid-template-columns:1fr 1fr}
+.seg button{min-height:44px;border:0;border-radius:10px;background:transparent;color:var(--dim);font:700 13px inherit;cursor:pointer;transition:background .2s,color .2s}
+.seg button.on{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff}
+.note{display:none;margin-bottom:12px;padding:10px 12px;border-radius:10px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.35);color:var(--warn);font-size:13px}
+.lbl{display:block;font-size:13px;font-weight:700;color:var(--dim);margin:6px 0}
+.fld{width:100%;min-height:48px;padding:12px 14px;border-radius:12px;border:1px solid var(--bd);background:var(--in);color:var(--tx);font:15px ui-monospace,Menlo,Consolas,monospace;outline:none;resize:vertical}
+.fld:focus{border-color:var(--ac2)}
+.kr{position:relative}.kr .fld{padding-inline-end:52px}
+.eye{position:absolute;inset-inline-end:4px;top:2px;min-width:44px;min-height:44px;background:none;border:0;color:var(--dim);font-size:18px;cursor:pointer}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--dim)}
+.gen{min-height:36px;padding:0 12px;border-radius:10px;border:1px solid var(--bd);background:transparent;color:var(--dim);font:700 12px inherit;cursor:pointer}
+.bar{height:6px;border-radius:9px;background:var(--in);overflow:hidden;margin-top:8px;border:1px solid var(--bd)}
+.bar i{display:block;height:100%;width:0;transition:width .3s,background .3s}
+.fw{margin-top:14px}
+.drop{border:2px dashed var(--bd);border-radius:14px;padding:22px 12px;text-align:center;color:var(--dim);cursor:pointer;word-break:break-all}
+.btns{display:flex;gap:8px;margin-top:16px}
+.main{flex:1;min-height:52px;border:0;border-radius:14px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font:800 15px inherit;letter-spacing:.08em;cursor:pointer}
+.main:disabled{background:var(--in);color:var(--dim);opacity:.6;cursor:not-allowed}
+.sec{min-height:52px;padding:0 18px;border-radius:14px;border:1px solid var(--bd);background:transparent;color:var(--dim);font:700 13px inherit;cursor:pointer}
+.prog{display:none;margin-top:12px}.prog .bar i{background:var(--ac2)}
+.out{display:none;margin-top:16px;padding:14px;border-radius:14px;border:1px solid var(--bd);background:var(--in)}
+.oh{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.ol{font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--ac)}.ol.e{color:var(--bad)}
+.oa{display:flex;gap:6px;flex-wrap:wrap}
+.oa button{min-height:40px;padding:0 12px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:700 12px inherit;cursor:pointer}
+.ot{font:14px/1.8 ui-monospace,Menlo,Consolas,monospace;word-break:break-all;user-select:all;white-space:pre-wrap}.ot.e{color:var(--bad)}
+.hh{display:flex;justify-content:space-between;align-items:center;margin:22px 4px 8px;font-size:12px;font-weight:700;color:var(--dim)}
+.hh button{background:none;border:0;color:var(--dim);font:12px inherit;min-height:36px;cursor:pointer}
+.hi{display:flex;gap:10px;align-items:center;min-height:44px;padding:8px 12px;margin-bottom:6px;border-radius:12px;border:1px solid var(--bd);background:var(--card);cursor:pointer;font:12px ui-monospace,monospace;color:var(--dim)}
+.hi span:nth-child(2){flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+footer{text-align:center;margin-top:24px;font-size:12px;color:var(--dim)}
+#toast{position:fixed;bottom:max(28px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(14px);opacity:0;transition:.3s;background:var(--ac);color:#fff;padding:11px 22px;border-radius:30px;font-weight:700;font-size:13px;pointer-events:none;z-index:9}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* ── Footer ── */
-.site-footer{margin-top:34px;padding-top:26px}
-.footer-chips{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-bottom:18px}
-.footer-chip{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:6px 14px;border-radius:20px;
-  border:1px solid rgba(153,85,255,0.18);
-  background:rgba(153,85,255,0.04);
-  font-size:10px;color:var(--text-dim);transition:all 0.25s;
-}
-.footer-chip:hover{border-color:rgba(153,85,255,0.45);background:rgba(153,85,255,0.09)}
-.chip-dot{width:5px;height:5px;border-radius:50%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);display:inline-block;flex-shrink:0}
-.footer-chip:nth-child(even) .chip-dot{background:var(--holo);box-shadow:0 0 6px var(--holo)}
-.footer-sig{
-  text-align:center;padding-top:16px;
-  border-top:1px solid rgba(153,85,255,0.10);
-  font-size:9px;letter-spacing:0.24em;
-  color:rgba(153,85,255,0.28);text-transform:uppercase;user-select:none;
-}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-
-<canvas id="cv-particles" aria-hidden="true"></canvas>
-<div class="scan" aria-hidden="true"></div>
-<div class="vign" aria-hidden="true"></div>
-<div id="toast" role="status" aria-live="polite">✦ COPIED</div>
-
-<div id="app">
 <div class="wrap">
-
-  <div class="title-area">
-    <div class="glitch-wrap" id="glitchWrap" data-text="CIPHERX" aria-label="CIPHERX">
-      <span class="title-mono" id="logoText" aria-hidden="true">CIPHERX</span>
-    </div>
-    <span class="subtitle">Secure Cryptosystem · Hybrid Engine</span>
+<header>
+  <div><h1>CIPHERX</h1><div class="sub" data-i="ft"></div></div>
+  <div class="hb"><button class="ib" id="langB" aria-label="Language">FA</button><button class="ib" id="themeB" aria-label="Theme">☾</button></div>
+</header>
+<div class="card">
+  <div class="seg c3" role="tablist">
+    <button class="on" id="tabText" data-i="tx"></button><button id="tabFile" data-i="fl"></button><button id="tabStego" data-i="sg"></button>
   </div>
+  <div class="seg c2"><button class="on" id="bEnc" data-i="en"></button><button id="bDec" data-i="de"></button></div>
+  <div class="seg c2" id="algoBox" style="display:none"><button class="on" id="aAuto" data-i="au"></button><button id="aClassic" data-i="cl"></button></div>
+  <div class="note" id="legNote" role="alert" data-i="ln"></div>
 
-  <div class="card" id="card">
-    <span class="build-tag" aria-hidden="true">v4.0 PRO</span>
+  <label class="lbl" for="keyInp" data-i="key"></label>
+  <div class="kr"><input class="fld" id="keyInp" type="password" maxlength="512" dir="auto" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-p="kph"/><button class="eye" id="eyeB" aria-label="Show key">◉</button></div>
+  <div class="row"><span id="entLbl"></span><button class="gen" id="genBtn" data-i="gen"></button></div>
+  <div class="bar" id="entBar" style="display:none"><i id="entFill"></i></div>
 
-    <!-- INPUT MODE SELECTOR TABS -->
-    <div class="input-tabs" role="tablist" aria-label="Input mode">
-      <button class="tab-btn active" id="tabText" role="tab">TEXT</button>
-      <button class="tab-btn" id="tabFile" role="tab">FILE</button>
-      <button class="tab-btn" id="tabStego" role="tab">STEGO</button>
-    </div>
-
-    <!-- ENCRYPT / DECRYPT & ALGO TOGGLES -->
-    <div class="toggle-container">
-      <div class="toggle" role="group" aria-label="Operation mode">
-        <button class="tog-btn on-enc" id="bEnc">ENCRYPT</button>
-        <button class="tog-btn" id="bDec">DECRYPT</button>
-      </div>
-      <div class="algo-toggle" id="algoContainer" role="group" aria-label="Algorithm">
-        <button class="algo-btn active-classic" id="aClassic">CLASSIC</button>
-        <button class="algo-btn" id="aMilitary">MILITARY</button>
-      </div>
-    </div>
-
-    <div class="algo-warn visible" id="classicWarn" role="alert">
-      <span class="algo-warn-icon" aria-hidden="true">⚠</span>
-      Classic uses a custom 4-layer cipher with full Unicode support — for learning and casual use. Use Military for sensitive data.
-    </div>
-
-    <div class="enc-mode-row" aria-live="polite">
-      <span class="enc-mode-dot" id="modeDot" aria-hidden="true"></span>
-      <span class="enc-mode-txt" id="modeTxt">Classic Mode (4-Layer · Random Padding) Active</span>
-    </div>
-
-    <!-- SECRET KEY FIELD -->
-    <div class="field-wrap">
-      <label class="lbl" for="keyInp">
-        <span class="lbl-dot" aria-hidden="true"></span>
-        Secret Key
-        <span class="translit-badge" id="keyBadge" aria-live="polite">Persian Detected</span>
-      </label>
-      <div class="key-row">
-        <!-- SECURITY #4: Anti-autofill attributes -->
-        <input class="field" id="keyInp" type="password"
-               placeholder="enter key..." maxlength="512"
-               autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-lpignore="true"
-               aria-label="Secret key"/>
-        <button class="eye-btn" id="eyeB" aria-label="Show key" aria-pressed="false">◉</button>
-      </div>
-      <div class="key-sub">
-        <div class="key-sub-top">
-          <button class="gen-btn" id="genBtn" aria-label="Generate random key">⟳ GENERATE</button>
-        </div>
-        <div class="entropy-wrap" id="entropyWrap" aria-live="polite">
-          <div class="entropy-header">
-            <span class="entropy-tag">Key Strength</span>
-            <span class="entropy-lbl" id="entropyLbl"></span>
-          </div>
-          <div class="str-bar-wrap">
-            <div class="str-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Key strength">
-              <div class="str-bar-fill" id="strBarFill"></div>
-            </div>
-            <span class="str-bar-pct" id="strBarPct" aria-hidden="true">0%</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- PANEL 1: TEXT PAYLOAD -->
-    <div class="field-wrap" id="pnlText">
-      <label class="lbl" for="txtInp">
-        <span class="lbl-dot" style="background:var(--cyan);box-shadow:0 0 7px var(--cyan)" aria-hidden="true"></span>
-        <span id="inLbl">Plaintext</span>
-        <span class="translit-badge" id="txtBadge" aria-live="polite">Persian Detected</span>
-      </label>
-      <!-- SECURITY #4: Anti-autofill attributes -->
-      <textarea class="field" id="txtInp" rows="2"
-                placeholder="your message..." maxlength="10000"
-                autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-lpignore="true"
-                aria-label="Message input"></textarea>
-      <div class="char-count" id="charCt" aria-live="polite">0 / 10000 chars</div>
-    </div>
-
-    <!-- PANEL 2: FILE PAYLOAD -->
-    <div class="field-wrap" id="pnlFile" style="display:none">
-      <label class="lbl">
-        <span class="lbl-dot" style="background:var(--gold);box-shadow:0 0 7px var(--gold)" aria-hidden="true"></span>
-        Target File
-      </label>
-      <div class="dropzone" id="fileDrop">
-        <span class="drop-icon">📁</span>
-        <span class="drop-txt" id="fileLbl">Click or Drag & Drop File Here</span>
-        <input type="file" id="fileInput" style="display:none"/>
-      </div>
-    </div>
-
-    <!-- PANEL 3: STEGANOGRAPHY CARRIER -->
-    <div class="field-wrap" id="pnlStego" style="display:none">
-      <label class="lbl">
-        <span class="lbl-dot" style="background:var(--pink);box-shadow:0 0 7px var(--pink)" aria-hidden="true"></span>
-        Stego Image Carrier (PNG/JPG)
-      </label>
-      <div class="dropzone" id="stegoDrop">
-        <span class="drop-icon">🖼️</span>
-        <span class="drop-txt" id="stegoLbl">Click or Drop Image Here</span>
-        <input type="file" id="stegoInput" accept="image/png, image/jpeg" style="display:none"/>
-      </div>
-    </div>
-
-    <!-- ACTION BUTTONS -->
-    <div class="btn-row">
-      <button class="btn-main" id="mainBtn" disabled>
-        <span class="btn-shine" aria-hidden="true"></span>
-        <span id="mainLbl">ENCRYPT</span>
-      </button>
-      <button class="btn-clr" id="clrBtn" aria-label="Clear all fields">CLR</button>
-    </div>
-
-    <p class="kbd-hint" aria-label="Keyboard shortcut: Control Enter to run">
-      Press <kbd class="kbd">Ctrl</kbd> + <kbd class="kbd">Enter</kbd> to run
-    </p>
-
-    <!-- OUTPUT BOX (CLEANED UP - ONLY SWAP & COPY) -->
-    <div id="outBox" style="display:none" class="out-box">
-      <div class="out-hdr">
-        <span class="out-lbl" id="outLbl">✦ ENCRYPTED</span>
-        <div class="out-acts">
-          <button class="btn-act" id="swapB" aria-label="Swap output to input">⇄</button>
-          <button class="btn-copy" id="copyBtn" aria-label="Copy result">COPY ✦</button>
-          <button class="btn-copy" id="saveDlBtn" style="display:none" aria-label="Save to Downloads">SAVE ⬇</button>
-          <button class="btn-act" id="shareOutBtn" style="display:none" aria-label="Share file">SHARE ⇢</button>
-        </div>
-      </div>
-      <div class="dots" id="dotsEl" style="display:none" aria-hidden="true">
-        <div class="dot" style="animation-delay:0s"></div>
-        <div class="dot" style="animation-delay:.16s"></div>
-        <div class="dot" style="animation-delay:.32s"></div>
-      </div>
-      <div class="out-text" id="outTxt" aria-live="assertive" aria-atomic="true"></div>
-    </div>
+  <div class="fw" id="pnlText">
+    <label class="lbl" for="txtInp" id="inLbl"></label>
+    <textarea class="fld" id="txtInp" rows="3" maxlength="10000" dir="auto" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-p="mph"></textarea>
+    <div class="row" style="justify-content:flex-end" id="charCt"></div>
   </div>
+  <div class="fw" id="pnlFile" style="display:none"><div class="drop" id="fileDrop"><span id="fileLbl"></span><input type="file" id="fileInput" hidden/></div></div>
+  <div class="fw" id="pnlStego" style="display:none"><div class="drop" id="stegoDrop"><span id="stegoLbl"></span><input type="file" id="stegoInput" accept="image/png,image/jpeg" hidden/></div></div>
 
-  <!-- RECENT OPERATIONS HISTORY -->
-  <section class="hist-section" aria-label="Recent operations">
-    <div class="hist-hdr">
-      <span class="hist-title">
-        <span class="hist-title-dot" aria-hidden="true"></span>
-        Recent Operations
-      </span>
-      <button class="hist-clear" id="histClearBtn">CLEAR ALL</button>
+  <div class="prog" id="prog"><div class="bar"><i id="progBar"></i></div></div>
+  <div class="btns"><button class="main" id="mainBtn" disabled></button><button class="sec" id="cncBtn" style="display:none" data-i="cnc"></button><button class="sec" id="clrBtn" data-i="clr"></button></div>
+
+  <div class="out" id="outBox">
+    <div class="oh"><span class="ol" id="outLbl"></span>
+      <div class="oa"><button id="swapB">⇄</button><button id="copyBtn" data-i="cp"></button><button id="saveBtn" style="display:none" data-i="sv"></button><button id="shareBtn" style="display:none" data-i="sh"></button></div>
     </div>
-    <div class="hist-list" id="histList" role="list"></div>
-  </section>
-
-  <!-- FOOTER CHIPS -->
-  <footer class="site-footer">
-    <div class="footer-chips" aria-label="Features">
-      <span class="footer-chip"><span class="chip-dot" aria-hidden="true"></span>4-Layer Cipher</span>
-      <span class="footer-chip"><span class="chip-dot" aria-hidden="true"></span>PBKDF2 · 600K Rounds</span>
-      <span class="footer-chip"><span class="chip-dot" aria-hidden="true"></span>Steganography</span>
-      <span class="footer-chip"><span class="chip-dot" aria-hidden="true"></span>File Crypto</span>
-      <span class="footer-chip"><span class="chip-dot" aria-hidden="true"></span>AES-GCM-256</span>
-      <span class="footer-chip"><span class="chip-dot" aria-hidden="true"></span>Memory Zeroization</span>
-    </div>
-    <div class="footer-sig">CIPHERX · Personal Encryption System</div>
-  </footer>
-
+    <div class="ot" id="outTxt" dir="auto" aria-live="polite"></div>
+  </div>
 </div>
+<div class="hh"><span data-i="hs"></span><button id="histClr" data-i="ca"></button></div>
+<div id="histList"></div>
+<footer>CIPHERX · AES-GCM-256 · PBKDF2 600K · CXv2</footer>
 </div>
+<div id="toast" role="status" aria-live="polite"></div>
 
 <script>
 'use strict';
+const $=id=>document.getElementById(id);
+const st=(k,v)=>{try{return v===undefined?localStorage.getItem(k):localStorage.setItem(k,v)}catch(e){}};
+const isNative=()=>!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
 
-// ─────────────────────────────────────────────
-// SECURITY #1: MEMORY ZEROIZATION ROUTINE
-// ─────────────────────────────────────────────
-function zeroMemory(...arrays) {
-  arrays.forEach(arr => {
-    if (arr && arr.fill) arr.fill(0);
-  });
+/* ───── i18n ───── */
+const L={en:{ft:'Personal encryption · AES-GCM-256',tx:'TEXT',fl:'FILE',sg:'STEGO',en:'ENCRYPT',de:'DECRYPT',au:'AUTO',cl:'CLASSIC (legacy)',
+key:'Secret key',kph:'enter key…',gen:'⟳ GENERATE',pl:'Plaintext',ci:'Ciphertext',hd:'Message to hide',mph:'your message…',
+dz:'Tap to choose a file',di:'Tap to choose an image (PNG/JPG)',clr:'CLR',cnc:'CANCEL',cp:'COPY',sv:'SAVE ⬇',sh:'SHARE ⇢',hs:'Recent operations',ca:'CLEAR ALL',
+ln:'Classic is kept only to open old messages. New data is always encrypted with AES-GCM-256.',
+bits:'bits (est.)',w:'WEAK',f:'FAIR',s:'STRONG',v:'VERY STRONG',oe:'✦ ENCRYPTED',od:'✦ DECRYPTED',er:'✦ ERROR',cpd:'COPIED',
+svd:'SAVED TO DOWNLOADS/CIPHERX',sf:'SAVE FAILED',shf:'SHARE FAILED',bad:'Wrong key or corrupted data',pr:'PROCESSING…',
+fe:'File encrypted — tap Save or Share',fd:'File decrypted — tap Save or Share',sd:'Text hidden in image — tap Save or Share',
+small:'Image is too small for this message',nos:'No CIPHERX data found in this image',cx:'Cancelled',chars:'chars'},
+fa:{ft:'رمزنگاری شخصی · AES-GCM-256',tx:'متن',fl:'فایل',sg:'تصویر',en:'رمزگذاری',de:'رمزگشایی',au:'خودکار',cl:'کلاسیک (قدیمی)',
+key:'کلید رمز',kph:'کلید را وارد کنید…',gen:'⟳ تولید',pl:'متن اصلی',ci:'متن رمزشده',hd:'پیام برای پنهان‌سازی',mph:'پیام شما…',
+dz:'برای انتخاب فایل بزنید',di:'برای انتخاب تصویر (PNG/JPG) بزنید',clr:'پاک',cnc:'لغو',cp:'کپی',sv:'ذخیره ⬇',sh:'اشتراک ⇢',hs:'عملیات اخیر',ca:'پاک‌کردن همه',
+ln:'حالت کلاسیک فقط برای باز کردن پیام‌های قدیمی نگه داشته شده. داده‌ی جدید همیشه با AES-GCM-256 رمز می‌شود.',
+bits:'بیت (تخمینی)',w:'ضعیف',f:'متوسط',s:'قوی',v:'خیلی قوی',oe:'✦ رمز شد',od:'✦ رمزگشایی شد',er:'✦ خطا',cpd:'کپی شد',
+svd:'در Downloads/CipherX ذخیره شد',sf:'ذخیره ناموفق بود',shf:'اشتراک ناموفق بود',bad:'کلید اشتباه است یا داده خراب شده',pr:'در حال پردازش…',
+fe:'فایل رمز شد — ذخیره یا اشتراک بزنید',fd:'فایل رمزگشایی شد — ذخیره یا اشتراک بزنید',sd:'متن در تصویر پنهان شد — ذخیره یا اشتراک بزنید',
+small:'تصویر برای این پیام کوچک است',nos:'در این تصویر داده‌ای از CIPHERX پیدا نشد',cx:'لغو شد',chars:'کاراکتر'}};
+let lang=st('cx_lang')||((navigator.language||'').startsWith('fa')?'fa':'en');
+const t=k=>L[lang][k]||L.en[k]||k;
+const S={tab:'text',mode:'enc',algo:'auto',out:'',show:false,file:null,img:null,pend:null,busy:false,ab:{stop:false},lastShare:0};
+const hist=[];
+
+/* ───── byte helpers ───── */
+const enc=new TextEncoder(),dec=new TextDecoder(),ITER=600000,CH=1<<20;
+const rnd=n=>crypto.getRandomValues(new Uint8Array(n));
+const u32=n=>new Uint8Array([n>>>24&255,n>>>16&255,n>>>8&255,n&255]);
+const rd32=(a,o)=>((a[o]<<24)|(a[o+1]<<16)|(a[o+2]<<8)|a[o+3])>>>0;
+const cat=(...p)=>{const o=new Uint8Array(p.reduce((s,x)=>s+x.length,0));let f=0;for(const x of p){o.set(x,f);f+=x.length}return o};
+const b64=u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)};
+const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const toB64=blob=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(',')[1]||'');r.onerror=no;r.readAsDataURL(blob)});
+const buf=async(f,a,b)=>new Uint8Array(await f.slice(a,b).arrayBuffer());
+async function dk(pass,salt,iter,use){
+  if(iter<1||iter>5e6)throw new Error(t('bad'));
+  const b=await crypto.subtle.importKey('raw',enc.encode(pass),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:iter,hash:'SHA-256'},b,{name:'AES-GCM',length:256},false,[use]);
 }
 
-// ─────────────────────────────────────────────
-// INLINE WEB WORKER — Classic 4-Layer Crypto
-// ─────────────────────────────────────────────
-const _WORKER_SRC = `
-'use strict';
-const ALLOWED_CHARS = Array.from({length:95},(_,i)=>String.fromCharCode(i+32)).join('');
-const N = 95;
-
-function textToB64(str){
-  const bytes = new TextEncoder().encode(str);
-  return btoa(Array.from(bytes, b => String.fromCharCode(b)).join(''));
+/* ───── TEXT: v2 (versioned, header authenticated) + legacy AES ───── */
+async function encText(p,pass){
+  const salt=rnd(16),iv=rnd(12),h=cat(new Uint8Array([2]),u32(ITER),salt,iv);
+  const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:h},await dk(pass,salt,ITER,'encrypt'),enc.encode(p)));
+  return 'CX2.'+b64(cat(h,ct));
 }
-function b64ToText(b64){
-  const bin = atob(b64);
-  return new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0)));
-}
-
-function getSecureSeed(keyStr){
-  let h1=0x85ebca6b, h2=0xc2b2ae35;
-  for(let i=0;i<keyStr.length;i++){
-    const c=keyStr.charCodeAt(i);
-    h1=Math.imul(h1^c,2654435761);
-    h2=Math.imul(h2^c,1597334677);
+async function decText(s,pass){
+  s=s.trim();
+  if(s.startsWith('CX2.')){
+    const a=unb64(s.slice(4)),h=a.slice(0,33);
+    return dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:a.slice(21,33),additionalData:h},await dk(pass,a.slice(5,21),rd32(a,1),'decrypt'),a.slice(33)));
   }
-  for(let r=0;r<60000;r++){
-    h1=Math.imul(h1^(h2>>>15),0x45d9f3b);
-    h2=Math.imul(h2^(h1>>>16),0x45d9f3b);
+  const a=unb64(s); /* legacy military: salt16|iv12|ct */
+  return dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:a.slice(16,28)},await dk(pass,a.slice(0,16),ITER,'decrypt'),a.slice(28)));
+}
+
+/* ───── CLASSIC (legacy, decrypt-only) ───── */
+const _W=`'use strict';
+const A=Array.from({length:95},(_,i)=>String.fromCharCode(i+32)).join('');const N=95;
+function b64ToText(b){const bin=atob(b);return new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0)));}
+function seed(k){let h1=0x85ebca6b,h2=0xc2b2ae35;for(let i=0;i<k.length;i++){const c=k.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677);}
+for(let r=0;r<60000;r++){h1=Math.imul(h1^(h2>>>15),0x45d9f3b);h2=Math.imul(h2^(h1>>>16),0x45d9f3b);}return(h1^h2)>>>0;}
+function mk(s){let r=s>>>0;return()=>{r^=r<<13;r^=r>>17;r^=r<<5;return(r>>>0)/4294967296;};}
+function stream(k,n,salt){const f=mk(seed(k+salt));return Array.from({length:n},()=>Math.floor(f()*N));}
+function perm(k,n){const f=mk(seed(k+':perm'));const idx=Array.from({length:n},(_,i)=>i);for(let i=n-1;i>0;i--){const j=Math.floor(f()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]];}return idx;}
+function unmix(arr,ks){const len=arr.length,half=Math.floor(len/2),r=[...arr];
+for(let i=half-1;i>=0;i--){const j=len-1-i;const mv=(ks[i+half]!==undefined?ks[i+half]:ks[i])%N;r[i]=((r[i]-r[j]-mv)%N+N)%N;}
+for(let i=half-1;i>=0;i--){const j=len-1-i;r[j]=((r[j]-r[i]-((ks[i]^ks[j])%N))%N+N)%N;}return r;}
+function decryptClassic(c,key){const len=c.length;
+const s1=stream(key,len,':L1-sub'),s2=stream(key,len,':L2-mix'),s3=stream(key,len,':L3-sub'),s4=stream(key,len,':L4-fst'),p=perm(key,len);
+let idx=Array.from(c,ch=>Math.max(0,A.indexOf(ch)));
+idx=unmix(idx,s2.map((v,i)=>v^s4[i]));
+idx=idx.map((v,i)=>((v-s3[i])%N+N)%N);
+const up=new Array(len);for(let i=0;i<len;i++)up[i]=idx[p[i]];
+idx=up.map((v,i)=>((v-s1[i])%N+N)%N);
+const res=idx.map(i=>A[i]).join('');const pl=A.indexOf(res[res.length-1]);
+if(pl<1||pl>5)throw new Error('bad');return b64ToText(res.slice(0,res.length-pl));}
+self.onmessage=e=>{const{id,key,txt}=e.data;try{self.postMessage({id,result:decryptClassic(txt,key)});}catch(err){self.postMessage({id,error:err.message});}};`;
+const _worker=new Worker(URL.createObjectURL(new Blob([_W],{type:'text/javascript'})));
+const _cbs=new Map();let _mid=0;
+_worker.onmessage=({data:{id,result,error}})=>{const c=_cbs.get(id);if(c){_cbs.delete(id);error?c.no(new Error(t('bad'))):c.ok(result);}};
+const classic=(key,txt)=>new Promise((ok,no)=>{const id=++_mid;_cbs.set(id,{ok,no});_worker.postMessage({id,key,txt});});
+async function decAny(s,key){s=s.trim();return(!s.startsWith('CX2.')&&S.algo==='classic')?classic(key,s):decText(s,key);}
+
+/* ───── FILES: CXv2 chunked format (1 MiB AES-GCM chunks, name encrypted, truncation-proof) ───── */
+async function encFile(file,pass,prog,ab){
+  const salt=rnd(16),np=rnd(8),h=cat(enc.encode('CXV2'),new Uint8Array([2]),u32(ITER),salt,np,u32(CH));
+  const key=await dk(pass,salt,ITER,'encrypt');
+  const E=async(i,ty,d)=>{const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv:cat(np,u32(i)),additionalData:cat(h,new Uint8Array([ty]))},key,d));return cat(u32(ct.length),ct);};
+  const parts=[h,await E(0,0,enc.encode(JSON.stringify({n:file.name,s:file.size})))];
+  for(let i=1,o=0;;i++,o+=CH){
+    if(ab.stop)throw new Error('cancelled');
+    const last=o+CH>=file.size;
+    parts.push(await E(i,last?2:1,await buf(file,o,o+CH)));
+    prog(Math.min(1,(o+CH)/Math.max(1,file.size)));
+    if(last)break;
   }
-  return(h1^h2)>>>0;
+  return{blob:new Blob(parts,{type:'application/octet-stream'}),name:file.name+'.enc'};
 }
-function makeRng(seed){
-  let r=seed>>>0;
-  return()=>{r^=r<<13;r^=r>>17;r^=r<<5;return(r>>>0)/4294967296;};
+async function decV1(file,pass){ /* old CXENC single-shot files */
+  const d=new Uint8Array(await file.arrayBuffer());let o=5;const nl=(d[o]<<8)|d[o+1];o+=2;
+  const name=dec.decode(d.slice(o,o+nl));o+=nl;
+  const salt=d.slice(o,o+16),iv=d.slice(o+16,o+28),ct=d.slice(o+28);
+  const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv},await dk(pass,salt,ITER,'decrypt'),ct);
+  return{blob:new Blob([pt]),name:name};
 }
-function getStream(key,length,salt){
-  const rand=makeRng(getSecureSeed(key+salt));
-  return Array.from({length},()=>Math.floor(rand()*N));
-}
-function getPermutation(key,length){
-  const rand=makeRng(getSecureSeed(key+':perm'));
-  const idx=Array.from({length},(_,i)=>i);
-  for(let i=length-1;i>0;i--){
-    const j=Math.floor(rand()*(i+1));
-    [idx[i],idx[j]]=[idx[j],idx[i]];
+async function decFile(file,pass,prog,ab){
+  const m=dec.decode(await buf(file,0,5));
+  if(m==='CXENC')return fixName(await decV1(file,pass));
+  if(m.slice(0,4)!=='CXV2')throw new Error(t('bad'));
+  const h=await buf(file,0,37),iter=rd32(h,5),salt=h.slice(9,25),np=h.slice(25,33),C=rd32(h,33);
+  if(C<1||C>(1<<24))throw new Error(t('bad'));
+  const key=await dk(pass,salt,iter,'decrypt');let pos=37;
+  const F=async(i,ty)=>{
+    if(pos+4>file.size)throw new Error(t('bad'));
+    const l=rd32(await buf(file,pos,pos+4),0);
+    if(l<16||l>C+16||pos+4+l>file.size)throw new Error(t('bad'));
+    const last=pos+4+l===file.size;
+    const ct=await buf(file,pos+4,pos+4+l);pos+=4+l;
+    return new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv:cat(np,u32(i)),additionalData:cat(h,new Uint8Array([ty===1&&last?2:ty]))},key,ct));
+  };
+  const meta=JSON.parse(dec.decode(await F(0,0))),parts=[];
+  for(let i=1;;i++){
+    if(ab.stop)throw new Error('cancelled');
+    parts.push(await F(i,1));
+    prog(Math.min(1,pos/file.size));
+    if(pos>=file.size)break;
   }
-  return idx;
+  return fixName({blob:new Blob(parts,{type:'application/octet-stream'}),name:String(meta.n||'decrypted.bin')});
 }
+const fixName=r=>{r.name=r.name.replace(/[\\/:*?"<>|\x00-\x1f]/g,'_').replace(/^\.+/,'')||'decrypted.bin';return r;};
 
-function feistelMix(arr, ks, fwd){
-  const len=arr.length, half=Math.floor(len/2), r=[...arr];
-  if(fwd){
-    for(let i=0;i<half;i++){ const j=len-1-i; r[j]=(r[j]+r[i]+((ks[i]^ks[j])%N))%N; }
-    for(let i=0;i<half;i++){ const j=len-1-i; const mv=(ks[i+half]!==undefined?ks[i+half]:ks[i])%N; r[i]=(r[i]+r[j]+mv)%N; }
-  } else {
-    for(let i=half-1;i>=0;i--){ const j=len-1-i; const mv=(ks[i+half]!==undefined?ks[i+half]:ks[i])%N; r[i]=((r[i]-r[j]-mv)%N+N)%N; }
-    for(let i=half-1;i>=0;i--){ const j=len-1-i; r[j]=((r[j]-r[i]-((ks[i]^ks[j])%N))%N+N)%N; }
+/* ───── STEGO (LSB, RGB only; carrier flattened to opaque so alpha can't corrupt bits) ───── */
+const px=s=>((s/3)|0)*4+s%3;
+function putBits(d,bytes,s0){let s=s0;for(const by of bytes)for(let k=7;k>=0;k--,s++)d[px(s)]=(d[px(s)]&254)|((by>>k)&1);}
+function getBits(d,n,s0){const o=new Uint8Array(n);let s=s0;for(let i=0;i<n;i++){let v=0;for(let k=0;k<8;k++,s++)v=(v<<1)|(d[px(s)]&1);o[i]=v;}return o;}
+const loadImg=f=>new Promise((ok,no)=>{const u=URL.createObjectURL(f),i=new Image();i.onload=()=>{URL.revokeObjectURL(u);ok(i);};i.onerror=()=>{URL.revokeObjectURL(u);no(new Error(t('bad')));};i.src=u;});
+async function stego(f,key,isEnc,txt){
+  const img=await loadImg(f),c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+  const x=c.getContext('2d',{willReadFrequently:true});x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0);
+  const im=x.getImageData(0,0,c.width,c.height),d=im.data,cap=c.width*c.height*3;
+  if(isEnc){
+    const eb=enc.encode(await encText(txt,key)),p=cat(enc.encode('CXS'),u32(eb.length),eb);
+    if(p.length*8>cap)throw new Error(t('small'));
+    putBits(d,p,0);x.putImageData(im,0,0);
+    const blob=await new Promise(r=>c.toBlob(r,'image/png'));
+    S.pend={blob,name:'stego_cipherx.png'};return t('sd');
   }
-  return r;
+  const h=getBits(d,7,0);
+  if(dec.decode(h.slice(0,3))!=='CXS')throw new Error(t('nos'));
+  const n=rd32(h,3);if(n<=0||n>1e6||(n+7)*8>cap)throw new Error(t('nos'));
+  return decAny(dec.decode(getBits(d,n,56)),key);
 }
 
-function encryptClassic(plain, key){
-  const encoded = textToB64(plain);
-  const padLen  = (Math.floor(Math.random()*5)) + 1;
-  let pad = '';
-  for(let i=0;i<padLen-1;i++) pad += ALLOWED_CHARS[Math.floor(Math.random()*N)];
-  pad += ALLOWED_CHARS[padLen];
-  const src = encoded + pad;
-  const len = src.length;
-
-  const s1=getStream(key,len,':L1-sub'), s2=getStream(key,len,':L2-mix'), s3=getStream(key,len,':L3-sub'), s4=getStream(key,len,':L4-fst'), p=getPermutation(key,len);
-  let idx = Array.from(src, c => Math.max(0, ALLOWED_CHARS.indexOf(c)));
-  idx = idx.map((v,i) => (v+s1[i])%N);
-  const pm = new Array(len);
-  for(let i=0;i<len;i++) pm[p[i]] = idx[i];
-  idx = pm.map((v,i) => (v+s3[i])%N);
-  idx = feistelMix(idx, s2.map((v,i) => v^s4[i]), true);
-  return idx.map(i => ALLOWED_CHARS[i]).join('');
+/* ───── SAVE / SHARE (native-aware) + cache hygiene ───── */
+function webDl(p){const u=URL.createObjectURL(p.blob),a=document.createElement('a');a.href=u;a.download=p.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);}
+const nativeArgs=async p=>({filename:p.name,contentType:p.blob.type||'application/octet-stream',base64Data:await toB64(p.blob)});
+async function sweepCache(){
+  if(!isNative())return;
+  try{const{Filesystem}=window.Capacitor.Plugins;const l=await Filesystem.readdir({path:'',directory:'CACHE'});
+    for(const f of l.files){await Filesystem.deleteFile({path:typeof f==='string'?f:f.name,directory:'CACHE'}).catch(()=>{});}}catch(e){}
+}
+async function doSave(){
+  if(!S.pend)return;
+  try{
+    if(!isNative())webDl(S.pend);
+    else await window.Capacitor.Plugins.FileSharer.save({...await nativeArgs(S.pend),android:{saveDirectory:'downloads',relativePath:'Download/CipherX'}});
+    toast(t('svd'));
+  }catch(e){toast(t('sf'));}
+}
+async function doShare(){
+  if(!S.pend)return;
+  try{
+    if(!isNative())webDl(S.pend);
+    else{await window.Capacitor.Plugins.FileSharer.share(await nativeArgs(S.pend));S.lastShare=Date.now();setTimeout(sweepCache,60000);}
+  }catch(e){toast(t('shf'));}
 }
 
-function decryptClassic(ciph, key){
-  const len = ciph.length;
-  const s1=getStream(key,len,':L1-sub'), s2=getStream(key,len,':L2-mix'), s3=getStream(key,len,':L3-sub'), s4=getStream(key,len,':L4-fst'), p=getPermutation(key,len);
-  let idx = Array.from(ciph, c => Math.max(0, ALLOWED_CHARS.indexOf(c)));
-  idx = feistelMix(idx, s2.map((v,i) => v^s4[i]), false);
-  idx = idx.map((v,i) => ((v-s3[i])%N+N)%N);
-  const up = new Array(len);
-  for(let i=0;i<len;i++) up[i] = idx[p[i]];
-  idx = up.map((v,i) => ((v-s1[i])%N+N)%N);
-  const res = idx.map(i => ALLOWED_CHARS[i]).join('');
-  const padLen = ALLOWED_CHARS.indexOf(res[res.length-1]);
-  if(padLen < 1 || padLen > 5) throw new Error('Wrong key or corrupted ciphertext');
-  return b64ToText(res.slice(0, res.length - padLen));
+/* ───── UI ───── */
+function toast(m){const e=$('toast');e.textContent=m;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2000);}
+function applyLang(){
+  document.documentElement.lang=lang;document.documentElement.dir=lang==='fa'?'rtl':'ltr';
+  document.querySelectorAll('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));
+  document.querySelectorAll('[data-p]').forEach(e=>e.placeholder=t(e.dataset.p));
+  $('langB').textContent=lang==='fa'?'EN':'FA';
+  refresh();onKey();onTxt();
 }
-
-self.onmessage = function(e){
-  const {id, action, key, txt} = e.data;
-  try {
-    const result = action === 'encrypt' ? encryptClassic(txt, key) : decryptClassic(txt, key);
-    self.postMessage({id, result});
-  } catch(err) { self.postMessage({id, error: err.message}); }
-};
-`;
-
-const _worker = new Worker(URL.createObjectURL(new Blob([_WORKER_SRC], {type:'text/javascript'})));
-const _workerCbs = new Map();
-let _msgId = 0;
-
-_worker.onmessage = ({data:{id,result,error}}) => {
-  const cb = _workerCbs.get(id);
-  if(cb){ _workerCbs.delete(id); error ? cb.reject(new Error(error)) : cb.resolve(result); }
-};
-
-function callWorker(action, key, txt){
-  return new Promise((resolve, reject) => {
-    const id = ++_msgId; _workerCbs.set(id, {resolve, reject});
-    _worker.postMessage({id, action, key, txt});
-  });
-}
-
-// ─────────────────────────────────────────────
-// STATE & CONSTANTS
-// ─────────────────────────────────────────────
-const state = {
-  tab:     'text',
-  mode:    'enc',
-  algo:    'classic',
-  output:  '',
-  showKey: false,
-  fileObj: null,
-  stegoObj: null,
-  pendingFile: null
-};
-const opHistory = [];
-const MAX_CHARS  = 10000;
-
-// ─────────────────────────────────────────────
-// MILITARY CRYPTO (AES-GCM-256 + PBKDF2)
-// ─────────────────────────────────────────────
-async function encryptMilitary(plain, pass){
-  const enc = new TextEncoder();
-  const plainBytes = enc.encode(plain);
-  const passBytes = enc.encode(pass);
-  const salt = crypto.getRandomValues(new Uint8Array(16));
-  const iv   = crypto.getRandomValues(new Uint8Array(12));
-
-  const bk = await crypto.subtle.importKey('raw', passBytes, 'PBKDF2', false, ['deriveKey']);
-  const ak = await crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:600000, hash:'SHA-256'}, bk, {name:'AES-GCM', length:256}, false, ['encrypt']);
-  const ct = new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv}, ak, plainBytes));
-
-  const out = new Uint8Array(16 + 12 + ct.length);
-  out.set(salt, 0); out.set(iv, 16); out.set(ct, 28);
-  const res = btoa(Array.from(out, b => String.fromCharCode(b)).join(''));
-
-  zeroMemory(plainBytes, passBytes, salt, iv, out);
-  return res;
-}
-
-async function decryptMilitary(b64, pass){
-  const enc = new TextEncoder();
-  const passBytes = enc.encode(pass);
-  const bin = atob(b64);
-  const all = Uint8Array.from(bin, c => c.charCodeAt(0));
-  const salt = all.slice(0,16), iv = all.slice(16,28), ct = all.slice(28);
-
-  const bk = await crypto.subtle.importKey('raw', passBytes, 'PBKDF2', false, ['deriveKey']);
-  const ak = await crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:600000, hash:'SHA-256'}, bk, {name:'AES-GCM', length:256}, false, ['decrypt']);
-  const pt = await crypto.subtle.decrypt({name:'AES-GCM', iv}, ak, ct);
-
-  const decoded = new TextDecoder().decode(pt);
-  zeroMemory(passBytes, all, salt, iv);
-  return decoded;
-}
-
-// ─────────────────────────────────────────────
-// FILE CRYPTO
-// ─────────────────────────────────────────────
-async function processFileCrypto(file, password, isEnc) {
-  const enc = new TextEncoder();
-  const passBytes = enc.encode(password);
-
-  if(isEnc) {
-    const fileBytes = new Uint8Array(await file.arrayBuffer());
-    const nameBytes = enc.encode(file.name);
-    const salt = crypto.getRandomValues(new Uint8Array(16));
-    const iv = crypto.getRandomValues(new Uint8Array(12));
-
-    const bk = await crypto.subtle.importKey('raw', passBytes, 'PBKDF2', false, ['deriveKey']);
-    const ak = await crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:600000, hash:'SHA-256'}, bk, {name:'AES-GCM', length:256}, false, ['encrypt']);
-    const ciphertext = new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM', iv}, ak, fileBytes));
-
-    const magic = enc.encode('CXENC');
-    const headerLen = magic.length + 2 + nameBytes.length + 16 + 12;
-    const result = new Uint8Array(headerLen + ciphertext.length);
-
-    let off = 0;
-    result.set(magic, off); off += magic.length;
-    result[off] = (nameBytes.length >> 8) & 0xFF; result[off+1] = nameBytes.length & 0xFF; off += 2;
-    result.set(nameBytes, off); off += nameBytes.length;
-    result.set(salt, off); off += 16;
-    result.set(iv, off); off += 12;
-    result.set(ciphertext, off);
-
-    triggerDownload(result, file.name + '.enc', 'application/octet-stream');
-    zeroMemory(fileBytes, nameBytes, passBytes, salt, iv);
-    return `✦ File Encrypted: ${file.name}.enc — tap Save or Share below`;
-  } else {
-    const data = new Uint8Array(await file.arrayBuffer());
-    const magic = new TextDecoder().decode(data.slice(0, 5));
-    if (magic !== 'CXENC') throw new Error('Invalid or corrupted .enc file');
-
-    let off = 5;
-    const nameLen = (data[off] << 8) | data[off + 1]; off += 2;
-    const origName = new TextDecoder().decode(data.slice(off, off + nameLen)); off += nameLen;
-    const salt = data.slice(off, off + 16); off += 16;
-    const iv = data.slice(off, off + 12); off += 12;
-    const ciphertext = data.slice(off);
-
-    const bk = await crypto.subtle.importKey('raw', passBytes, 'PBKDF2', false, ['deriveKey']);
-    const ak = await crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:600000, hash:'SHA-256'}, bk, {name:'AES-GCM', length:256}, false, ['decrypt']);
-    const plaintext = await crypto.subtle.decrypt({name:'AES-GCM', iv}, ak, ciphertext);
-
-    triggerDownload(new Uint8Array(plaintext), origName, 'application/octet-stream');
-    zeroMemory(passBytes, salt, iv);
-    return `✦ File Decrypted: ${origName} — tap Save or Share below`;
-  }
-}
-
-// ─────────────────────────────────────────────
-// SECURITY #5: NATIVE-AWARE FILE SAVE
-// (WebView on Android can't handle blob/data-url
-// <a download> clicks the way a real browser can —
-// so on native we save via the FileSharer plugin,
-// which writes to the real public Downloads/CipherX
-// folder or opens the native Share sheet, as chosen
-// explicitly by the user via the two result buttons.)
-// ─────────────────────────────────────────────
-function browserDownloadFallback(data, fileName, mimeType) {
-  let url, isBlob = false;
-  if (data instanceof Uint8Array) {
-    url = URL.createObjectURL(new Blob([data], { type: mimeType }));
-    isBlob = true;
-  } else {
-    url = data;
-  }
-  const a = document.createElement('a');
-  a.href = url; a.download = fileName;
-  document.body.appendChild(a); a.click(); a.remove();
-  if (isBlob) setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-
-async function saveToDownloads(data, fileName, mimeType) {
-  const isNative = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-  if (!isNative) { browserDownloadFallback(data, fileName, mimeType); return; }
-
-  const { FileSharer } = window.Capacitor.Plugins;
-  const base64Data = data instanceof Uint8Array
-    ? btoa(Array.from(data, b => String.fromCharCode(b)).join(''))
-    : data;
-
-  await FileSharer.save({
-    filename: fileName,
-    contentType: mimeType,
-    base64Data,
-    android: { saveDirectory: 'downloads', relativePath: 'Download/CipherX' }
-  });
-}
-
-async function shareFile(data, fileName, mimeType) {
-  const isNative = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-  if (!isNative) { browserDownloadFallback(data, fileName, mimeType); return; }
-
-  const { FileSharer } = window.Capacitor.Plugins;
-  const base64Data = data instanceof Uint8Array
-    ? btoa(Array.from(data, b => String.fromCharCode(b)).join(''))
-    : data;
-
-  await FileSharer.share({ filename: fileName, contentType: mimeType, base64Data });
-}
-
-// بعد از Share، پوشه‌ی کش اپ رو (که فقط همین کپی‌های موقتی توشه) با یه تاخیر خالی می‌کنیم
-async function sweepShareCache() {
-  const isNative = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-  if (!isNative) return;
-  try {
-    const { Filesystem } = window.Capacitor.Plugins;
-    const listing = await Filesystem.readdir({ path: '', directory: 'CACHE' });
-    for (const f of listing.files) {
-      const name = typeof f === 'string' ? f : f.name;
-      await Filesystem.deleteFile({ path: name, directory: 'CACHE' }).catch(() => {});
-    }
-  } catch (e) { /* silent — cache sweep isn't critical */ }
-}
-
-function triggerDownload(bytes, fileName, mimeType) {
-  state.pendingFile = { data: bytes, fileName, mimeType };
-}
-
-// ─────────────────────────────────────────────
-// STEGANOGRAPHY ENGINE
-// ─────────────────────────────────────────────
-const STEGO_MAGIC = [0x43, 0x58, 0x53]; // 'CXS'
-
-async function processStego(file, key, isEnc, plainPayload) {
-  const img = await loadImage(file);
-  const canvas = document.createElement('canvas');
-  canvas.width = img.width; canvas.height = img.height;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(img, 0, 0);
-
-  if (isEnc) {
-    const ciphText = state.algo === 'classic'
-      ? await callWorker('encrypt', key, plainPayload)
-      : await encryptMilitary(plainPayload, key);
-
-    const encBytes = new TextEncoder().encode(ciphText);
-    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imgData.data;
-
-    const header = new Uint8Array(7);
-    header[0] = STEGO_MAGIC[0]; header[1] = STEGO_MAGIC[1]; header[2] = STEGO_MAGIC[2];
-    header[3] = (encBytes.length >> 24) & 0xFF;
-    header[4] = (encBytes.length >> 16) & 0xFF;
-    header[5] = (encBytes.length >> 8) & 0xFF;
-    header[6] = encBytes.length & 0xFF;
-
-    const payload = new Uint8Array(header.length + encBytes.length);
-    payload.set(header, 0); payload.set(encBytes, header.length);
-
-    const totalBits = payload.length * 8;
-    const maxCapacityBits = Math.floor((data.length / 4) * 3);
-
-    if (totalBits > maxCapacityBits) throw new Error('Image dimensions too small for this message payload!');
-
-    let bitIdx = 0;
-    for (let i = 0; i < data.length && bitIdx < totalBits; i++) {
-      if (i % 4 === 3) continue; // Skip Alpha
-      const byteIndex = Math.floor(bitIdx / 8);
-      const bitValue = (payload[byteIndex] >> (7 - (bitIdx % 8))) & 1;
-      data[i] = (data[i] & 0xFE) | bitValue;
-      bitIdx++;
-    }
-
-    ctx.putImageData(imgData, 0, 0);
-
-    const dataUrl = canvas.toDataURL('image/png');
-    state.pendingFile = { data: dataUrl, fileName: 'stego_cipherx.png', mimeType: 'image/png' };
-
-    zeroMemory(encBytes, header, payload);
-    return '✦ Ciphertext hidden in image! Tap Save or Share below.';
-  } else {
-    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imgData.data;
-
-    const header = new Uint8Array(7);
-    let bitIdx = 0;
-    for (let i = 0; i < data.length && bitIdx < 56; i++) {
-      if (i % 4 === 3) continue;
-      const bit = data[i] & 1;
-      const byteIndex = Math.floor(bitIdx / 8);
-      header[byteIndex] = (header[byteIndex] << 1) | bit;
-      bitIdx++;
-    }
-
-    if (header[0] !== STEGO_MAGIC[0] || header[1] !== STEGO_MAGIC[1] || header[2] !== STEGO_MAGIC[2]) {
-      throw new Error('No CIPHERX stego payload found in this image!');
-    }
-
-    const payloadLen = (header[3] << 24) | (header[4] << 16) | (header[5] << 8) | header[6];
-    if(payloadLen <= 0 || payloadLen > 1000000) throw new Error('Corrupted stego header');
-
-    const encBytes = new Uint8Array(payloadLen);
-    let pBit = 0, totalBits = payloadLen * 8;
-
-    for (let i = 0; i < data.length && pBit < totalBits; i++) {
-      if (i % 4 === 3) continue;
-      if (bitIdx > 0) { bitIdx--; continue; }
-      const bit = data[i] & 1;
-      const byteIndex = Math.floor(pBit / 8);
-      encBytes[byteIndex] = (encBytes[byteIndex] << 1) | bit;
-      pBit++;
-    }
-
-    const extractedCiph = new TextDecoder().decode(encBytes);
-
-    const decryptedText = state.algo === 'classic'
-      ? await callWorker('decrypt', key, extractedCiph)
-      : await decryptMilitary(extractedCiph, key);
-
-    zeroMemory(header, encBytes);
-    return decryptedText;
-  }
-}
-
-function loadImage(file) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error('Failed to load carrier image'));
-    img.src = URL.createObjectURL(file);
-  });
-}
-
-// ─────────────────────────────────────────────
-// PARTICLE SYSTEM
-// ─────────────────────────────────────────────
-(function(){
-  const canvas = document.getElementById('cv-particles');
-  const ctx    = canvas.getContext('2d');
-  let W, H, particles = [];
-  const COLORS = ['rgba(153,85,255,','rgba(68,170,255,','rgba(180,80,255,','rgba(51,85,255,','rgba(200,120,255,'];
-
-  function resize(){ W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
-
-  function Particle(){
-    this.x  = Math.random()*W; this.y  = Math.random()*H;
-    this.vx = (Math.random()-.5)*.35; this.vy = (Math.random()-.5)*.35;
-    this.r  = Math.random()*1.6+.5;
-    this.col = COLORS[Math.floor(Math.random()*COLORS.length)];
-    this.baseOp = Math.random()*.5+.2;
-    this.phase  = Math.random()*Math.PI*2;
-    this.speed  = Math.random()*.012+.005;
-  }
-
-  function init(){
-    const n = Math.min(90, Math.floor(W*H/14000));
-    particles = Array.from({length:n}, () => new Particle());
-  }
-
-  let t = 0;
-  function draw(){
-    ctx.clearRect(0,0,W,H); t += .008;
-    particles.forEach(p => {
-      p.x += p.vx; p.y += p.vy;
-      if(p.x < -5) p.x = W+5; if(p.x > W+5) p.x = -5;
-      if(p.y < -5) p.y = H+5; if(p.y > H+5) p.y = -5;
-      const op = p.baseOp * (.6 + .4*Math.sin(t*p.speed*60+p.phase));
-      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle = p.col+op+')'; ctx.fill();
-    });
-    for(let i=0;i<particles.length;i++){
-      for(let j=i+1;j<particles.length;j++){
-        const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
-        const d=Math.sqrt(dx*dx+dy*dy);
-        if(d<110){
-          ctx.beginPath();
-          ctx.moveTo(particles[i].x,particles[i].y);
-          ctx.lineTo(particles[j].x,particles[j].y);
-          ctx.strokeStyle='rgba(130,70,255,'+(1-d/110)*.18+')';
-          ctx.lineWidth=.6; ctx.stroke();
-        }
-      }
-    }
-    requestAnimationFrame(draw);
-  }
-
-  window.addEventListener('resize', () => { resize(); init(); });
-  resize(); init(); draw();
-})();
-
-// ─────────────────────────────────────────────
-// TYPEWRITER & LOGO SCRAMBLE
-// ─────────────────────────────────────────────
-let _twTimer = null;
-function typewriterEffect(el, text){
-  clearTimeout(_twTimer);
-  el.textContent = ''; el.classList.add('typing');
-  let i = 0;
-  if(text.length > 180){
-    const chunk = Math.ceil(text.length/60);
-    (function tick(){
-      if(i >= text.length){ el.classList.remove('typing'); return; }
-      el.textContent = text.slice(0, i+chunk); i += chunk;
-      _twTimer = setTimeout(tick, 14);
-    })();
-  } else {
-    const spd = text.length > 80 ? 8 : 22;
-    (function tick(){
-      if(i >= text.length){ el.classList.remove('typing'); return; }
-      el.textContent = text.slice(0, ++i);
-      _twTimer = setTimeout(tick, spd);
-    })();
-  }
-}
-
-const _SCRAMBLE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*!?';
-const _LOGO     = 'CIPHERX';
-let _scramTimer = null;
-
-function triggerLogoScramble(){
-  const el   = document.getElementById('logoText');
-  const wrap = document.getElementById('glitchWrap');
-  if(!el || !wrap) return;
-  clearTimeout(_scramTimer);
-  wrap.classList.add('scrambling');
-  let frame = 0; const total = 18;
-  (function tick(){
-    const rev = Math.floor(frame/total * _LOGO.length);
-    el.textContent = Array.from(_LOGO, (_,i) =>
-      i < rev ? _LOGO[i] : _SCRAMBLE[Math.floor(Math.random()*_SCRAMBLE.length)]
-    ).join('');
-    frame++;
-    if(frame <= total) _scramTimer = setTimeout(tick, 42);
-    else { el.textContent = _LOGO; wrap.classList.remove('scrambling'); }
-  })();
-}
-
-function hasFarsi(str){ return /[\u0600-\u06FF]/.test(str); }
-
-// ─────────────────────────────────────────────
-// UI MODE & ALGORITHMS SWITCHERS
-// ─────────────────────────────────────────────
-function setAlgo(a){
-  state.algo = a;
-  const ac   = document.getElementById('aClassic');
-  const am   = document.getElementById('aMilitary');
-  const mt   = document.getElementById('modeTxt');
-  const md   = document.getElementById('modeDot');
-  const warn = document.getElementById('classicWarn');
-
-  if(a === 'classic'){
-    ac.className = 'algo-btn active-classic';
-    am.className = 'algo-btn';
-    mt.textContent = 'Classic Mode (4-Layer · Random Padding) Active';
-    md.style.cssText = 'background:var(--holo);box-shadow:0 0 7px var(--holo)';
-    warn.classList.add('visible');
-  } else {
-    ac.className = 'algo-btn';
-    am.className = 'algo-btn active-military';
-    mt.textContent = 'Military Grade Mode (AES-GCM-256 · 600K PBKDF2) Active';
-    md.style.cssText = 'background:var(--cyan);box-shadow:0 0 7px var(--cyan)';
-    warn.classList.remove('visible');
-  }
-}
-
-function setMode(m){
-  state.mode = m; state.output = '';
-  document.getElementById('outBox').style.display = 'none';
-  const card = document.getElementById('card');
-  const be   = document.getElementById('bEnc');
-  const bd   = document.getElementById('bDec');
-  const ml   = document.getElementById('mainLbl');
-  const il   = document.getElementById('inLbl');
-  const mb   = document.getElementById('mainBtn');
-
-  if(m === 'enc'){
-    be.className='tog-btn on-enc'; bd.className='tog-btn';
-    card.className='card'; ml.textContent='ENCRYPT';
-    if(il) il.textContent='Plaintext'; mb.className='btn-main';
-  } else {
-    be.className='tog-btn'; bd.className='tog-btn on-dec';
-    card.className='card mode-dec'; ml.textContent='DECRYPT';
-    if(il) il.textContent='Ciphertext'; mb.className='btn-main dec';
-  }
-  updatePanels();
-}
-
-// ─────────────────────────────────────────────
-// DYNAMIC PANEL VISIBILITY & STEGO BUG FIX
-// ─────────────────────────────────────────────
-function updatePanels() {
-  const pnlText = document.getElementById('pnlText');
-  const pnlFile = document.getElementById('pnlFile');
-  const pnlStego = document.getElementById('pnlStego');
-  const il = document.getElementById('inLbl');
-
-  if (state.tab === 'text') {
-    pnlText.style.display = 'block';
-    pnlFile.style.display = 'none';
-    pnlStego.style.display = 'none';
-    if(il) il.textContent = state.mode === 'enc' ? 'Plaintext' : 'Ciphertext';
-  } else if (state.tab === 'file') {
-    pnlText.style.display = 'none';
-    pnlFile.style.display = 'block';
-    pnlStego.style.display = 'none';
-  } else if (state.tab === 'stego') {
-    pnlFile.style.display = 'none';
-    pnlStego.style.display = 'block';
-    // FIX: STEGO DECRYPT DOES NOT REQUIRE TEXT INPUT
-    if (state.mode === 'enc') {
-      pnlText.style.display = 'block';
-      if(il) il.textContent = 'Message to Hide';
-    } else {
-      pnlText.style.display = 'none'; // Hidden in decrypt stego mode!
-    }
-  }
+function setTheme(m){document.documentElement.dataset.theme=m;$('themeB').textContent=m==='dark'?'☾':'☀';$('themeB').setAttribute('aria-label','Theme: '+m);}
+function refresh(){
+  const e=S.mode==='enc',tb=S.tab;
+  $('bEnc').classList.toggle('on',e);$('bDec').classList.toggle('on',!e);
+  ['Text','File','Stego'].forEach(n=>$('tab'+n).classList.toggle('on',tb===n.toLowerCase()));
+  $('algoBox').style.display=(!e&&tb!=='file')?'grid':'none';
+  $('aAuto').classList.toggle('on',S.algo==='auto');$('aClassic').classList.toggle('on',S.algo==='classic');
+  $('legNote').style.display=(!e&&tb!=='file'&&S.algo==='classic')?'block':'none';
+  $('pnlText').style.display=(tb==='text'||(tb==='stego'&&e))?'block':'none';
+  $('pnlFile').style.display=tb==='file'?'block':'none';
+  $('pnlStego').style.display=tb==='stego'?'block':'none';
+  $('inLbl').textContent=tb==='stego'?t('hd'):(e?t('pl'):t('ci'));
+  $('fileLbl').textContent=S.file?S.file.name:t('dz');
+  $('stegoLbl').textContent=S.img?S.img.name:t('di');
+  if(!S.busy)$('mainBtn').textContent=e?t('en'):t('de');
   updateBtn();
 }
-
-// ─────────────────────────────────────────────
-// FIELD HANDLERS & STRENGTH METER
-// ─────────────────────────────────────────────
-function onKey(){
-  const k = document.getElementById('keyInp').value;
-  document.getElementById('keyBadge').className =
-    'translit-badge' + (hasFarsi(k) ? ' visible' : '');
-
-  if(!k){
-    document.getElementById('entropyWrap').style.display = 'none';
-    updateBtn(); return;
-  }
-  document.getElementById('entropyWrap').style.display = 'block';
-
-  let score = Math.min(40, k.length * 3.5);
-  if(/[a-z\u0600-\u06FF]/u.test(k)) score += 15;
-  if(/[A-Z]/.test(k))                score += 15;
-  if(/[0-9]/.test(k))                score += 15;
-  if(/[^A-Za-z0-9\u0600-\u06FF]/u.test(k)) score += 15;
-  score = Math.min(100, Math.round(score));
-
-  const bar  = document.getElementById('strBarFill');
-  const pct  = document.getElementById('strBarPct');
-  const lbl  = document.getElementById('entropyLbl');
-  const prog = document.querySelector('.str-bar-track');
-
-  bar.style.width = score + '%';
-  if(prog) prog.setAttribute('aria-valuenow', score);
-  if(pct)  pct.textContent = score + '%';
-
-  if(score < 40){
-    bar.style.background  = 'linear-gradient(90deg,#cc0022,#ff2244,#ff6688)';
-    if(pct) pct.style.color = '#ff4466';
-    if(lbl){ lbl.textContent = 'WEAK'; lbl.style.color = '#ff4466'; }
-  } else if(score < 75){
-    bar.style.background  = 'linear-gradient(90deg,#0033cc,#1155ff,#33aaff,#44ddff)';
-    if(pct) pct.style.color = 'var(--cyan)';
-    if(lbl){ lbl.textContent = 'STRONG'; lbl.style.color = 'var(--cyan)'; }
-  } else {
-    bar.style.background  = 'linear-gradient(90deg,#4400aa,#7733ee,#9955ff,#cc88ff,#44aaff)';
-    if(pct) pct.style.color = 'var(--holo)';
-    if(lbl){ lbl.textContent = 'UNBREAKABLE'; lbl.style.color = 'var(--holo)'; }
-  }
-  updateBtn();
-}
-
-function onTxt(){
-  const t  = document.getElementById('txtInp').value;
-  const ct = document.getElementById('charCt');
-  ct.textContent = t.length + ' / ' + MAX_CHARS + ' chars';
-  ct.className   = 'char-count' +
-    (t.length >= MAX_CHARS ? ' at-limit' : t.length > MAX_CHARS * .85 ? ' near-limit' : '');
-  document.getElementById('txtBadge').className =
-    'translit-badge' + (hasFarsi(t) ? ' visible' : '');
-  updateBtn();
-}
-
+function setMode(m){S.mode=m;S.out='';S.pend=null;$('outBox').style.display='none';refresh();}
 function updateBtn(){
-  const k = document.getElementById('keyInp').value.trim();
-  const mb = document.getElementById('mainBtn');
-
-  if(state.tab === 'text') {
-    mb.disabled = !(k && document.getElementById('txtInp').value.trim());
-  } else if(state.tab === 'file') {
-    mb.disabled = !(k && state.fileObj);
-  } else if(state.tab === 'stego') {
-    if(state.mode === 'enc') {
-      mb.disabled = !(k && state.stegoObj && document.getElementById('txtInp').value.trim());
-    } else {
-      mb.disabled = !(k && state.stegoObj);
-    }
-  }
+  const k=$('keyInp').value.trim(),x=$('txtInp').value.trim();let ok;
+  if(S.tab==='text')ok=k&&x;else if(S.tab==='file')ok=k&&S.file;else ok=k&&S.img&&(S.mode==='dec'||x);
+  $('mainBtn').disabled=!ok||S.busy;
 }
-
-// ─────────────────────────────────────────────
-// MAIN EXECUTION ROUTINE
-// ─────────────────────────────────────────────
+function onKey(){
+  const k=$('keyInp').value;$('entBar').style.display=k?'block':'none';
+  if(!k){$('entLbl').textContent='';updateBtn();return;}
+  let p=0;if(/[a-z]/.test(k))p+=26;if(/[A-Z]/.test(k))p+=26;if(/\d/.test(k))p+=10;if(/[^A-Za-z0-9]/.test(k))p+=33;
+  const b=Math.round(k.length*Math.log2(p||1)*0.8),lv=b<45?['w','var(--bad)']:b<70?['f','var(--warn)']:b<100?['s','var(--ac2)']:['v','var(--ok)'];
+  $('entFill').style.width=Math.min(100,b)+'%';$('entFill').style.background=lv[1];
+  $('entLbl').textContent=t(lv[0])+' · ~'+b+' '+t('bits');updateBtn();
+}
+function onTxt(){const n=$('txtInp').value.length;$('charCt').textContent=n+' / 10000 '+t('chars');updateBtn();}
+function addHist(c){
+  const d=new Date();hist.unshift({c,time:String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')});if(hist.length>4)hist.pop();
+  const l=$('histList');l.textContent='';
+  hist.forEach(h=>{const i=document.createElement('div');i.className='hi';i.tabIndex=0;
+    i.addEventListener('click',()=>{$('txtInp').value=h.c;onTxt();});
+    const a=document.createElement('span');a.textContent='ENC';const b=document.createElement('span');b.textContent=h.c.slice(0,32);b.dir='ltr';const c=document.createElement('span');c.textContent=h.time;
+    i.append(a,b,c);l.appendChild(i);});
+}
+const prog=f=>{$('progBar').style.width=Math.round(f*100)+'%';};
 async function go(){
-  const key = document.getElementById('keyInp').value;
-  if(!key.trim()) return;
-
-  triggerLogoScramble();
-
-  const ob = document.getElementById('outBox');
-  const de = document.getElementById('dotsEl');
-  const ot = document.getElementById('outTxt');
-  const mb = document.getElementById('mainBtn');
-  const ml = document.getElementById('mainLbl');
-  const ol = document.getElementById('outLbl');
-
-  ob.style.display = ''; de.style.display = 'flex';
-  ot.textContent = ''; ot.className = 'out-text';
-  mb.disabled = true; ml.textContent = 'PROCESSING...';
-  ol.className = 'out-lbl' + (state.mode === 'dec' ? ' dec' : '');
-  ob.className  = 'out-box' + (state.mode === 'dec' ? ' dec' : '');
-  state.pendingFile = null;
-  document.getElementById('saveDlBtn').style.display = 'none';
-  document.getElementById('shareOutBtn').style.display = 'none';
-
-  let res, isError = false;
-  try {
-    if(state.tab === 'text') {
-      const txt = document.getElementById('txtInp').value;
-      if(state.algo === 'classic') res = await callWorker(state.mode === 'enc' ? 'encrypt' : 'decrypt', key, txt);
-      else res = state.mode === 'enc' ? await encryptMilitary(txt, key) : await decryptMilitary(txt, key);
-    } else if(state.tab === 'file') {
-      res = await processFileCrypto(state.fileObj, key, state.mode === 'enc');
-    } else if(state.tab === 'stego') {
-      const txt = document.getElementById('txtInp').value;
-      res = await processStego(state.stegoObj, key, state.mode === 'enc', txt);
-    }
-  } catch(e){
-    res = e.message || 'Operation failed — check key or file';
-    isError = true;
-  }
-
-  state.output = isError ? '' : res;
-  de.style.display = 'none';
-  mb.disabled = false;
-  ml.textContent = state.mode === 'enc' ? 'ENCRYPT' : 'DECRYPT';
-  ol.textContent  = isError ? '✦ ERROR' : (state.mode === 'enc' ? '✦ ENCRYPTED' : '✦ DECRYPTED');
-
-  if(isError){
-    ot.textContent = res; ot.className = 'out-text error';
-  } else {
-    ot.className = 'out-text';
-    typewriterEffect(ot, res);
-    addHist(state.mode, res);
-    if (state.pendingFile) {
-      document.getElementById('saveDlBtn').style.display = '';
-      document.getElementById('shareOutBtn').style.display = '';
-    }
-  }
+  const key=$('keyInp').value;if(!key.trim()||S.busy)return;
+  S.busy=true;S.ab={stop:false};S.pend=null;
+  const isEnc=S.mode==='enc';
+  $('outBox').style.display='block';$('outLbl').className='ol';$('outLbl').textContent=t('pr');$('outTxt').className='ot';$('outTxt').textContent='';
+  $('saveBtn').style.display=$('shareBtn').style.display='none';
+  $('mainBtn').disabled=true;$('mainBtn').textContent=t('pr');
+  const fileOp=S.tab==='file';if(fileOp){$('prog').style.display='block';prog(0);$('cncBtn').style.display='';}
+  let res,err=false;
+  try{
+    if(S.tab==='text'){const x=$('txtInp').value;res=isEnc?await encText(x,key):await decAny(x,key);}
+    else if(S.tab==='file'){const r=isEnc?await encFile(S.file,key,prog,S.ab):await decFile(S.file,key,prog,S.ab);S.pend={blob:r.blob,name:r.name};res=isEnc?t('fe'):t('fd');}
+    else res=await stego(S.img,key,isEnc,$('txtInp').value);
+  }catch(e){err=true;res=(e instanceof DOMException||!e.message)?t('bad'):(e.message==='cancelled'?t('cx'):e.message);}
+  S.busy=false;$('prog').style.display='none';$('cncBtn').style.display='none';
+  S.out=err?'':res;
+  $('outLbl').textContent=err?t('er'):(isEnc?t('oe'):t('od'));$('outLbl').className='ol'+(err?' e':'');
+  $('outTxt').className='ot'+(err?' e':'');$('outTxt').textContent=res;
+  if(!err){if(isEnc&&S.tab==='text')addHist(res);if(S.pend){$('saveBtn').style.display=$('shareBtn').style.display='';}}
+  refresh();
 }
-
-// ─────────────────────────────────────────────
-// ACTIONS & UTILITIES
-// ─────────────────────────────────────────────
 function clearAll(){
-  document.getElementById('keyInp').value = '';
-  document.getElementById('txtInp').value = '';
-  document.getElementById('outBox').style.display = 'none';
-  document.getElementById('entropyWrap').style.display = 'none';
-  state.output = ''; state.fileObj = null; state.stegoObj = null; state.pendingFile = null;
-  document.getElementById('fileLbl').textContent = 'Click or Drag & Drop File Here';
-  document.getElementById('stegoLbl').textContent = 'Click or Drop Image Here';
-  document.getElementById('saveDlBtn').style.display = 'none';
-  document.getElementById('shareOutBtn').style.display = 'none';
-  onTxt(); updateBtn();
+  S.ab.stop=true;$('keyInp').value='';$('txtInp').value='';$('outBox').style.display='none';
+  S.out='';S.file=S.img=S.pend=null;$('fileInput').value=$('stegoInput').value='';onKey();onTxt();refresh();
 }
+function genKey(){$('keyInp').value=Array.from(rnd(16),b=>b.toString(16).padStart(2,'0')).join('');onKey();}
+function doSwap(){if(!S.out||S.tab!=='text')return;$('txtInp').value=S.out;S.out='';onTxt();setMode(S.mode==='enc'?'dec':'enc');}
 
-function toggleEye(){
-  state.showKey = !state.showKey;
-  const inp = document.getElementById('keyInp');
-  const btn = document.getElementById('eyeB');
-  inp.type  = state.showKey ? 'text' : 'password';
-  btn.textContent = state.showKey ? '◎' : '◉';
-}
-
-function genKey(){
-  const bytes = crypto.getRandomValues(new Uint8Array(16));
-  document.getElementById('keyInp').value =
-    Array.from(bytes, b => b.toString(16).padStart(2,'0')).join('');
-  onKey();
-}
-
-function showToast(msg){
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('on');
-  setTimeout(() => t.classList.remove('on'), 2000);
-}
-
-function doCopy(){
-  if(!state.output) return;
-  if(navigator.clipboard){
-    navigator.clipboard.writeText(state.output).then(() => showToast('✦ COPIED TO CLIPBOARD'));
-  }
-}
-
-function doSwap(){
-  if(!state.output) return;
-  document.getElementById('txtInp').value = state.output;
-  state.output = '';
-  onTxt(); setMode(state.mode === 'enc' ? 'dec' : 'enc');
-  document.getElementById('outBox').style.display = 'none';
-}
-
-async function onSaveClick(){
-  if (!state.pendingFile) return;
-  try {
-    await saveToDownloads(state.pendingFile.data, state.pendingFile.fileName, state.pendingFile.mimeType);
-    showToast('✦ SAVED TO DOWNLOADS/CIPHERX');
-  } catch(e) {
-    showToast('✦ SAVE FAILED');
-  }
-}
-
-async function onShareClick(){
-  if (!state.pendingFile) return;
-  try {
-    await shareFile(state.pendingFile.data, state.pendingFile.fileName, state.pendingFile.mimeType);
-    setTimeout(sweepShareCache, 60000); // ۱ دقیقه فرصت به مقصد برای خوندن فایل، بعد پاک می‌شه
-  } catch(e) {
-    showToast('✦ SHARE FAILED');
-  }
-}
-
-// ─────────────────────────────────────────────
-// HISTORY SECTION
-// ─────────────────────────────────────────────
-function addHist(m, full){
-  const now = new Date();
-  const time = now.getHours().toString().padStart(2,'0') + ':' +
-               now.getMinutes().toString().padStart(2,'0');
-  opHistory.unshift({ m, algo:state.algo, preview:full.slice(0,28), full, time });
-  if(opHistory.length > 4) opHistory.pop();
-  renderHist();
-}
-
-function renderHist(){
-  const list = document.getElementById('histList');
-  list.innerHTML = '';
-  opHistory.forEach(h => {
-    const item = document.createElement('div');
-    item.className = 'hist-item';
-    item.setAttribute('role', 'listitem');
-    item.setAttribute('tabindex', '0');
-
-    const activate = () => {
-      document.getElementById('txtInp').value = h.full;
-      onTxt();
-    };
-    item.addEventListener('click', activate);
-
-    const b1 = document.createElement('span');
-    b1.className   = 'hist-badge ' + h.m;
-    b1.textContent = h.m.toUpperCase();
-
-    const b2 = document.createElement('span');
-    b2.className   = 'hist-badge ' + (h.algo === 'military' ? 'military-tag' : 'classic-tag');
-    b2.textContent = h.algo.toUpperCase();
-
-    const prev = document.createElement('span');
-    prev.className   = 'hist-preview';
-    prev.textContent = h.preview;
-
-    const tm = document.createElement('span');
-    tm.className   = 'hist-time';
-    tm.textContent = h.time;
-
-    item.append(b1, b2, prev, tm);
-    list.appendChild(item);
-  });
-}
-
-function clearHist(){
-  opHistory.splice(0); renderHist();
-}
-
-// ─────────────────────────────────────────────
-// INIT & EVENT BINDINGS
-// ─────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  // Input Tabs Switcher
-  ['Text', 'File', 'Stego'].forEach(t => {
-    document.getElementById('tab' + t).addEventListener('click', () => {
-      state.tab = t.toLowerCase();
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('tab' + t).classList.add('active');
-      updatePanels();
-    });
-  });
-
-  // Mode & Algo Switches
-  document.getElementById('bEnc').addEventListener('click', () => setMode('enc'));
-  document.getElementById('bDec').addEventListener('click', () => setMode('dec'));
-  document.getElementById('aClassic').addEventListener('click', () => setAlgo('classic'));
-  document.getElementById('aMilitary').addEventListener('click', () => setAlgo('military'));
-  document.getElementById('eyeB').addEventListener('click', toggleEye);
-  document.getElementById('genBtn').addEventListener('click', genKey);
-  document.getElementById('keyInp').addEventListener('input', onKey);
-  document.getElementById('txtInp').addEventListener('input', onTxt);
-  document.getElementById('mainBtn').addEventListener('click', go);
-  document.getElementById('clrBtn').addEventListener('click', clearAll);
-  document.getElementById('swapB').addEventListener('click', doSwap);
-  document.getElementById('copyBtn').addEventListener('click', doCopy);
-  document.getElementById('saveDlBtn').addEventListener('click', onSaveClick);
-  document.getElementById('shareOutBtn').addEventListener('click', onShareClick);
-  document.getElementById('histClearBtn').addEventListener('click', clearHist);
-
-  // File Controls
-  const fileDrop = document.getElementById('fileDrop'), fileInput = document.getElementById('fileInput');
-  fileDrop.addEventListener('click', () => fileInput.click());
-  fileInput.addEventListener('change', e => {
-    if(e.target.files.length) { state.fileObj = e.target.files[0]; document.getElementById('fileLbl').textContent = state.fileObj.name; updateBtn(); }
-  });
-
-  const stegoDrop = document.getElementById('stegoDrop'), stegoInput = document.getElementById('stegoInput');
-  stegoDrop.addEventListener('click', () => stegoInput.click());
-  stegoInput.addEventListener('change', e => {
-    if(e.target.files.length) { state.stegoObj = e.target.files[0]; document.getElementById('stegoLbl').textContent = state.stegoObj.name; updateBtn(); }
-  });
-
-  // Ctrl + Enter Shortcut
-  document.addEventListener('keydown', e => {
-    if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
-      e.preventDefault();
-      const mb = document.getElementById('mainBtn');
-      if(!mb.disabled) go();
-    }
-  });
+window.addEventListener('DOMContentLoaded',()=>{
+  setTheme(st('cx_theme')||(matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'));
+  ['Text','File','Stego'].forEach(n=>$('tab'+n).addEventListener('click',()=>{S.tab=n.toLowerCase();refresh();}));
+  $('bEnc').addEventListener('click',()=>setMode('enc'));$('bDec').addEventListener('click',()=>setMode('dec'));
+  $('aAuto').addEventListener('click',()=>{S.algo='auto';refresh();});$('aClassic').addEventListener('click',()=>{S.algo='classic';refresh();});
+  $('langB').addEventListener('click',()=>{lang=lang==='fa'?'en':'fa';st('cx_lang',lang);applyLang();});
+  $('themeB').addEventListener('click',()=>{const m=document.documentElement.dataset.theme==='dark'?'light':'dark';st('cx_theme',m);setTheme(m);});
+  $('eyeB').addEventListener('click',()=>{S.show=!S.show;$('keyInp').type=S.show?'text':'password';$('eyeB').textContent=S.show?'◎':'◉';});
+  $('genBtn').addEventListener('click',genKey);$('keyInp').addEventListener('input',onKey);$('txtInp').addEventListener('input',onTxt);
+  $('mainBtn').addEventListener('click',go);$('clrBtn').addEventListener('click',clearAll);$('cncBtn').addEventListener('click',()=>{S.ab.stop=true;});
+  $('swapB').addEventListener('click',doSwap);
+  $('copyBtn').addEventListener('click',()=>{if(S.out&&navigator.clipboard)navigator.clipboard.writeText(S.out).then(()=>toast(t('cpd')));});
+  $('saveBtn').addEventListener('click',doSave);$('shareBtn').addEventListener('click',doShare);
+  $('histClr').addEventListener('click',()=>{hist.length=0;$('histList').textContent='';});
+  $('fileDrop').addEventListener('click',()=>$('fileInput').click());$('stegoDrop').addEventListener('click',()=>$('stegoInput').click());
+  $('fileInput').addEventListener('change',e=>{S.file=e.target.files[0]||null;refresh();});
+  $('stegoInput').addEventListener('change',e=>{S.img=e.target.files[0]||null;refresh();});
+  document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();if(!$('mainBtn').disabled)go();}});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-S.lastShare>120000)sweepCache();});
+  applyLang();sweepCache();
 });
 </script>
 </body>
