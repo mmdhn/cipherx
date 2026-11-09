@@ -104,6 +104,15 @@ jobs:
           }
           EOF
 
+      - name: Add Argon2 (BouncyCastle) dependency
+        if: ${{ inputs.native_plugin }}
+        run: |
+          cat >> android/app/build.gradle << 'EOF'
+          dependencies {
+              implementation 'org.bouncycastle:bcprov-jdk18on:1.78.1'
+          }
+          EOF
+
       - name: Decode signing keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/cipherx.keystore
 

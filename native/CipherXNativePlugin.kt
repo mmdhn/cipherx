@@ -3,6 +3,9 @@ package com.cipherx.app
 import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
+import android.util.Base64
+import org.bouncycastle.crypto.generators.Argon2BytesGenerator
+import org.bouncycastle.crypto.params.Argon2Parameters
 import com.getcapacitor.JSObject
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
@@ -57,6 +60,37 @@ class CipherXNativePlugin : Plugin() {
         val f = extract(intent)
         if (f != null) activity?.intent = Intent()  // consume so it is not re-opened
         call.resolve(f ?: JSObject())
+    }
+
+    /**
+     * Argon2id key derivation (BouncyCastle). Input/outputs are base64.
+     * Runs on the Capacitor plugin thread, never on the UI thread.
+     */
+    @PluginMethod
+    fun argon2id(call: PluginCall) {
+        try {
+            val pw = Base64.decode(call.getString("password") ?: "", Base64.NO_WRAP)
+            val salt = Base64.decode(call.getString("salt") ?: "", Base64.NO_WRAP)
+            val t = call.getInt("t") ?: 3
+            val m = call.getInt("m") ?: 32768
+            val p = call.getInt("p") ?: 2
+            val params = Argon2Parameters.Builder(Argon2Parameters.ARGON2_id)
+                .withVersion(Argon2Parameters.ARGON2_VERSION_13)
+                .withIterations(t)
+                .withMemoryAsKB(m)
+                .withParallelism(p)
+                .withSalt(salt)
+                .build()
+            val gen = Argon2BytesGenerator()
+            gen.init(params)
+            val out = ByteArray(32)
+            gen.generateBytes(pw, out)
+            val r = JSObject()
+            r.put("key", Base64.encodeToString(out, Base64.NO_WRAP))
+            call.resolve(r)
+        } catch (e: Exception) {
+            call.reject(e.message ?: "argon2id failed")
+        }
     }
 
     /** App already running (singleTask): a new intent arrives. */

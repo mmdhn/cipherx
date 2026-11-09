@@ -1,17 +1,20 @@
 import sys
 p = sys.argv[1] if len(sys.argv) > 1 else '.github/workflows/build.yml'
 s = open(p, encoding='utf8').read()
-if 'native_plugin' in s:
-    print('workflow already patched'); sys.exit(0)
-inp = """      native_plugin:
-        description: 'Native Kotlin plugin (open .enc from other apps). Untick if the build fails'
+done = []
+KEY = '      - name: Decode signing keystore'
+assert KEY in s, 'keystore step not found'
+
+if 'native_plugin' not in s:
+    inp = """      native_plugin:
+        description: 'Native Kotlin plugin (open .enc from other apps, Argon2id). Untick if the build fails'
         type: boolean
         default: true
 """
-k = '    inputs:\n'
-assert k in s, 'inputs block not found'
-s = s.replace(k, k + inp, 1)
-step = r"""      - name: Apply native Kotlin plugin
+    k = '    inputs:\n'
+    assert k in s, 'inputs block not found'
+    s = s.replace(k, k + inp, 1)
+    step = r"""      - name: Apply native Kotlin plugin
         if: ${{ inputs.native_plugin }}
         run: |
           set -e
@@ -31,8 +34,22 @@ step = r"""      - name: Apply native Kotlin plugin
           EOF
 
 """
-m = '      - name: Decode signing keystore'
-assert m in s, 'keystore step not found'
-s = s.replace(m, step + m, 1)
+    s = s.replace(KEY, step + KEY, 1)
+    done.append('native')
+
+if 'bcprov' not in s:
+    bc = r"""      - name: Add Argon2 (BouncyCastle) dependency
+        if: ${{ inputs.native_plugin }}
+        run: |
+          cat >> android/app/build.gradle << 'EOF'
+          dependencies {
+              implementation 'org.bouncycastle:bcprov-jdk18on:1.78.1'
+          }
+          EOF
+
+"""
+    s = s.replace(KEY, bc + KEY, 1)
+    done.append('argon2')
+
 open(p, 'w', encoding='utf8').write(s)
-print('workflow patched')
+print('workflow patched:', done or 'nothing to do')

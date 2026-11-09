@@ -85,6 +85,9 @@ footer{text-align:center;margin-top:26px;font:11px var(--mono);letter-spacing:.1
 #toast{position:fixed;bottom:max(28px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(16px);opacity:0;transition:.3s var(--e);background:linear-gradient(135deg,var(--ac),var(--pk));color:#fff;padding:11px 22px;border-radius:30px;font:700 13px var(--mono);pointer-events:none;z-index:9;max-width:90vw;text-align:center;box-shadow:0 0 24px rgba(255,46,147,.5)}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .pk{display:none;margin-bottom:12px;animation:rise .3s var(--e)}.pk small{display:block;color:var(--dim);font-size:12px;margin-top:8px}
+.seg.c4{grid-template-columns:repeat(4,1fr)}.seg.c4 button{letter-spacing:0;font-size:12px}
+.vi button{min-height:36px;padding:0 10px;border-radius:8px;border:1px solid var(--bd);background:var(--in);color:var(--tx);font:700 11px var(--mono);cursor:pointer}.vi button:hover{border-color:var(--ac2)}
+.vi span:nth-child(1){flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.vi span:nth-child(2){flex:none;overflow:visible}
 /* ── motion ── */
 @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @keyframes pop{0%{transform:scale(.88)}60%{transform:scale(1.05)}100%{transform:scale(1)}}
@@ -106,10 +109,10 @@ footer{text-align:center;margin-top:26px;font:11px var(--mono);letter-spacing:.1
   <div class="hb"><button class="ib" id="langB" aria-label="Language">FA</button><button class="ib" id="themeB" aria-label="Theme">☾</button></div>
 </header>
 <div class="card">
-  <div class="seg c3" role="tablist">
-    <button class="on" id="tabText" data-i="tx"></button><button id="tabFile" data-i="fl"></button><button id="tabStego" data-i="sg"></button>
+  <div class="seg c4" role="tablist">
+    <button class="on" id="tabText" data-i="tx"></button><button id="tabFile" data-i="fl"></button><button id="tabStego" data-i="sg"></button><button id="tabVault" data-i="vl"></button>
   </div>
-  <div class="seg c2"><button class="on" id="bEnc" data-i="en"></button><button id="bDec" data-i="de"></button></div>
+  <div class="seg c2" id="modeBox"><button class="on" id="bEnc" data-i="en"></button><button id="bDec" data-i="de"></button></div>
   <div class="seg c3" id="algoBox" style="display:none"><button class="on" id="aAuto" data-i="au"></button><button id="aClassic" data-i="cl"></button><button id="aPk" data-i="pk"></button></div>
   <div class="note" id="legNote" role="alert" data-i="ln"></div>
   <div class="pk" id="pkBox"><div id="pkRecipW"><label class="lbl" for="pkRecip" data-i="pkr"></label><textarea class="fld" id="pkRecip" rows="2" dir="ltr" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-lpignore="true" placeholder="CXPK1.…"></textarea></div>
@@ -117,7 +120,7 @@ footer{text-align:center;margin-top:26px;font:11px var(--mono);letter-spacing:.1
 
   <label class="lbl" for="keyInp" data-i="key"></label>
   <div class="kr"><input class="fld" id="keyInp" type="password" maxlength="512" dir="auto" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-p="kph"/><button class="eye" id="eyeB" aria-label="Show key">◉</button></div>
-  <div class="row"><span id="entLbl"></span><button class="gen" id="genBtn" data-i="gen"></button></div>
+  <div class="row"><span id="entLbl"></span><span style="display:flex;gap:6px"><button class="gen" id="kdfBtn" style="display:none"></button><button class="gen" id="genBtn" data-i="gen"></button></span></div>
   <div class="bar" id="entBar" style="display:none"><i id="entFill"></i></div>
 
   <div class="fw" id="pnlText">
@@ -127,6 +130,8 @@ footer{text-align:center;margin-top:26px;font:11px var(--mono);letter-spacing:.1
   </div>
   <div class="fw" id="pnlFile" style="display:none"><div class="drop" id="fileDrop"><span id="fileLbl"></span><input type="file" id="fileInput" hidden/></div></div>
   <div class="fw" id="pnlStego" style="display:none"><div class="drop" id="stegoDrop"><span id="stegoLbl"></span><input type="file" id="stegoInput" accept="image/png,image/jpeg" hidden/></div></div>
+
+  <div class="fw" id="pnlVault" style="display:none"><div id="vBox" style="display:none"><div class="drop" id="vDrop"><span data-i="vadd"></span><input type="file" id="vInput" hidden multiple/></div><div class="row" id="vTot"></div></div><div id="vList" style="margin-top:10px"></div></div>
 
   <div class="prog" id="prog"><div class="bar"><i id="progBar"></i></div></div>
   <div class="btns"><button class="main" id="mainBtn" disabled></button><button class="sec" id="cncBtn" style="display:none" data-i="cnc"></button><button class="sec" id="clrBtn" data-i="clr"></button></div>
@@ -159,7 +164,7 @@ ln:'Classic is a light cipher for everyday, non-sensitive use. It is NOT secure 
 bits:'bits (est.)',w:'WEAK',f:'FAIR',s:'STRONG',v:'VERY STRONG',oe:'✦ ENCRYPTED',od:'✦ DECRYPTED',er:'✦ ERROR',cpd:'COPIED',
 svd:'SAVED TO DOWNLOADS/CIPHERX',sf:'SAVE FAILED',shf:'SHARE FAILED',bad:'Wrong key or corrupted data',pr:'PROCESSING…',
 fe:'File encrypted — tap Save or Share',fd:'File decrypted — tap Save or Share',sd:'Text hidden in image — tap Save or Share',
-small:'Image is too small for this message',nos:'No CIPHERX data found in this image',cx:'Cancelled',chars:'chars',pk:'PUBLIC KEY',pkr:'Recipient public key',pkg:'⚿ NEW KEYS',pks:'MY PUBLIC KEY',pkn:'Encrypts to the recipient public key; only their private key can open it. To decrypt, type YOUR keys passphrase in Secret key. The sender is not authenticated.',qr:'QR',qrbig:'Too long for a QR code',nokeys:'No keys on this device - create them first',pkbad:'Invalid public key',pkrep:'Keys exist! Tap again to REPLACE them (old messages become unreadable)',pkpass:'Type a passphrase in Secret key first',cap:'capacity ~',opened:'Opened'},
+small:'Image is too small for this message',nos:'No CIPHERX data found in this image',cx:'Cancelled',chars:'chars',pk:'PUBLIC KEY',pkr:'Recipient public key',pkg:'⚿ NEW KEYS',pks:'MY PUBLIC KEY',pkn:'Encrypts to the recipient public key; only their private key can open it. To decrypt, type YOUR keys passphrase in Secret key. The sender is not authenticated.',qr:'QR',qrbig:'Too long for a QR code',nokeys:'No keys on this device - create them first',pkbad:'Invalid public key',pkrep:'Keys exist! Tap again to REPLACE them (old messages become unreadable)',pkpass:'Type a passphrase in Secret key first',cap:'capacity ~',opened:'Opened',vl:'VAULT',vo:'OPEN VAULT',vadd:'Tap to add files to the vault',vemp:'Vault is empty',vnat:'Vault works in the Android app only',vexp:'EXPORT',vdel:'DELETE',vsure:'SURE?',vtot:'stored',vdone:'Added to vault',a2:'ARGON2ID',a2need:'Argon2id needs the Android app with native plugin'},
 fa:{ft:'رمزنگاری شخصی · AES-GCM-256',tx:'متن',fl:'فایل',sg:'تصویر',en:'رمزگذاری',de:'رمزگشایی',au:'AES-GCM',cl:'کلاسیک',
 key:'کلید رمز',kph:'کلید را وارد کنید…',gen:'⟳ تولید',pl:'متن اصلی',ci:'متن رمزشده',hd:'پیام برای پنهان‌سازی',mph:'پیام شما…',
 dz:'برای انتخاب فایل بزنید',di:'برای انتخاب تصویر (PNG/JPG) بزنید',clr:'پاک',cnc:'لغو',cp:'کپی',sv:'ذخیره ⬇',sh:'اشتراک ⇢',hs:'عملیات اخیر',ca:'پاک‌کردن همه',
@@ -167,10 +172,10 @@ ln:'کلاسیک یک رمز سبک برای کارهای روزمره و غیر
 bits:'بیت (تخمینی)',w:'ضعیف',f:'متوسط',s:'قوی',v:'خیلی قوی',oe:'✦ رمز شد',od:'✦ رمزگشایی شد',er:'✦ خطا',cpd:'کپی شد',
 svd:'در Downloads/CipherX ذخیره شد',sf:'ذخیره ناموفق بود',shf:'اشتراک ناموفق بود',bad:'کلید اشتباه است یا داده خراب شده',pr:'در حال پردازش…',
 fe:'فایل رمز شد — ذخیره یا اشتراک بزنید',fd:'فایل رمزگشایی شد — ذخیره یا اشتراک بزنید',sd:'متن در تصویر پنهان شد — ذخیره یا اشتراک بزنید',
-small:'تصویر برای این پیام کوچک است',nos:'در این تصویر داده‌ای از CIPHERX پیدا نشد',cx:'لغو شد',chars:'کاراکتر',pk:'کلید عمومی',pkr:'کلید عمومی گیرنده',pkg:'⚿ کلید جدید',pks:'کلید عمومی من',pkn:'پیام با کلید عمومی گیرنده رمز می‌شود و فقط کلید خصوصی او آن را باز می‌کند. برای رمزگشایی، رمز کلیدهای خودت را در «کلید رمز» بنویس. هویت فرستنده تأیید نمی‌شود.',qr:'QR',qrbig:'برای QR خیلی طولانی است',nokeys:'روی این دستگاه کلیدی نیست - اول بساز',pkbad:'کلید عمومی نامعتبر است',pkrep:'کلید قبلی هست! دوباره بزن تا جایگزین شود (پیام‌های قبلی باز نمی‌شوند)',pkpass:'اول یک رمز در «کلید رمز» بنویس',cap:'ظرفیت ~',opened:'باز شد'}};
+small:'تصویر برای این پیام کوچک است',nos:'در این تصویر داده‌ای از CIPHERX پیدا نشد',cx:'لغو شد',chars:'کاراکتر',pk:'کلید عمومی',pkr:'کلید عمومی گیرنده',pkg:'⚿ کلید جدید',pks:'کلید عمومی من',pkn:'پیام با کلید عمومی گیرنده رمز می‌شود و فقط کلید خصوصی او آن را باز می‌کند. برای رمزگشایی، رمز کلیدهای خودت را در «کلید رمز» بنویس. هویت فرستنده تأیید نمی‌شود.',qr:'QR',qrbig:'برای QR خیلی طولانی است',nokeys:'روی این دستگاه کلیدی نیست - اول بساز',pkbad:'کلید عمومی نامعتبر است',pkrep:'کلید قبلی هست! دوباره بزن تا جایگزین شود (پیام‌های قبلی باز نمی‌شوند)',pkpass:'اول یک رمز در «کلید رمز» بنویس',cap:'ظرفیت ~',opened:'باز شد',vl:'گاوصندوق',vo:'باز کردن گاوصندوق',vadd:'برای افزودن فایل به گاوصندوق بزن',vemp:'گاوصندوق خالی است',vnat:'گاوصندوق فقط در اپ اندروید کار می‌کند',vexp:'خروجی',vdel:'حذف',vsure:'مطمئنی؟',vtot:'ذخیره شده',vdone:'به گاوصندوق اضافه شد',a2:'ARGON2ID',a2need:'Argon2id به اپ اندروید با پلاگین native نیاز دارد'}};
 let lang=st('cx_lang')||((navigator.language||'').startsWith('fa')?'fa':'en');
 const t=k=>L[lang][k]||L.en[k]||k;
-const S={tab:'text',mode:'enc',algo:'auto',out:'',show:false,file:null,img:null,pend:null,busy:false,ab:{stop:false},lastShare:0,cap:0,pkc:0};
+const S={tab:'text',mode:'enc',algo:'auto',out:'',show:false,file:null,img:null,pend:null,busy:false,ab:{stop:false},lastShare:0,cap:0,pkc:0,kdf2:false};
 const hist=[];
 
 /* ───── byte helpers ───── */
@@ -183,7 +188,16 @@ const b64=u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.a
 const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 const toB64=blob=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(',')[1]||'');r.onerror=no;r.readAsDataURL(blob)});
 const buf=async(f,a,b)=>new Uint8Array(await f.slice(a,b).arrayBuffer());
-async function dk(pass,salt,iter,use){
+const A2P=(3<<24)|(2<<16)|32; /* argon2id: t=3, p=2, m=32 MiB packed into the iteration field */
+const kdfVer=()=>(S.kdf2&&NP())?3:2;
+async function dk(pass,salt,iter,use,ver){
+  if(ver===3){
+    const tt=iter>>>24,pp=(iter>>>16)&255,mm=iter&65535;
+    if(tt<1||tt>10||pp<1||pp>8||mm<1||mm>256)throw new Error(t('bad'));
+    const np=NP();if(!np)throw new Error(t('a2need'));
+    const r=await np.argon2id({password:b64(enc.encode(pass)),salt:b64(salt),t:tt,m:mm*1024,p:pp});
+    return crypto.subtle.importKey('raw',unb64(r.key),{name:'AES-GCM'},false,[use]);
+  }
   if(iter<1||iter>5e6)throw new Error(t('bad'));
   const b=await crypto.subtle.importKey('raw',enc.encode(pass),'PBKDF2',false,['deriveKey']);
   return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:iter,hash:'SHA-256'},b,{name:'AES-GCM',length:256},false,[use]);
@@ -191,15 +205,15 @@ async function dk(pass,salt,iter,use){
 
 /* ───── TEXT: v2 (versioned, header authenticated) + legacy AES ───── */
 async function encText(p,pass){
-  const salt=rnd(16),iv=rnd(12),h=cat(new Uint8Array([2]),u32(ITER),salt,iv);
-  const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:h},await dk(pass,salt,ITER,'encrypt'),enc.encode(p)));
+  const v=kdfVer(),it=v===3?A2P:ITER,salt=rnd(16),iv=rnd(12),h=cat(new Uint8Array([v]),u32(it),salt,iv);
+  const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:h},await dk(pass,salt,it,'encrypt',v),enc.encode(p)));
   return 'CX2.'+b64(cat(h,ct));
 }
 async function decText(s,pass){
   s=s.trim();
   if(s.startsWith('CX2.')){
     const a=unb64(s.slice(4)),h=a.slice(0,33);
-    return dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:a.slice(21,33),additionalData:h},await dk(pass,a.slice(5,21),rd32(a,1),'decrypt'),a.slice(33)));
+    return dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:a.slice(21,33),additionalData:h},await dk(pass,a.slice(5,21),rd32(a,1),'decrypt',a[0]),a.slice(33)));
   }
   const a=unb64(s); /* legacy military: salt16|iv12|ct */
   return dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:a.slice(16,28)},await dk(pass,a.slice(0,16),ITER,'decrypt'),a.slice(28)));
@@ -349,8 +363,8 @@ function drawQR(txt){
 
 /* ───── FILES: CXv2 chunked format (1 MiB AES-GCM chunks, name encrypted, truncation-proof) ───── */
 async function encFile(file,pass,prog,ab){
-  const salt=rnd(16),np=rnd(8),h=cat(enc.encode('CXV2'),new Uint8Array([2]),u32(ITER),salt,np,u32(CH));
-  const key=await dk(pass,salt,ITER,'encrypt');
+  const v=kdfVer(),it=v===3?A2P:ITER,salt=rnd(16),np=rnd(8),h=cat(enc.encode('CXV2'),new Uint8Array([v]),u32(it),salt,np,u32(CH));
+  const key=await dk(pass,salt,it,'encrypt',v);
   const E=async(i,ty,d)=>{const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv:cat(np,u32(i)),additionalData:cat(h,new Uint8Array([ty]))},key,d));return cat(u32(ct.length),ct);};
   const parts=[h,await E(0,0,enc.encode(JSON.stringify({n:file.name,s:file.size})))];
   for(let i=1,o=0;;i++,o+=CH){
@@ -375,7 +389,7 @@ async function decFile(file,pass,prog,ab){
   if(m.slice(0,4)!=='CXV2')throw new Error(t('bad'));
   const h=await buf(file,0,37),iter=rd32(h,5),salt=h.slice(9,25),np=h.slice(25,33),C=rd32(h,33);
   if(C<1||C>(1<<24))throw new Error(t('bad'));
-  const key=await dk(pass,salt,iter,'decrypt');let pos=37;
+  const key=await dk(pass,salt,iter,'decrypt',h[4]);let pos=37;
   const F=async(i,ty)=>{
     if(pos+4>file.size)throw new Error(t('bad'));
     const l=rd32(await buf(file,pos,pos+4),0);
@@ -483,24 +497,25 @@ function setTheme(m){document.documentElement.dataset.theme=m;setTimeout(()=>{bg
 function refresh(){
   const e=S.mode==='enc',tb=S.tab;
   $('bEnc').classList.toggle('on',e);$('bDec').classList.toggle('on',!e);
-  ['Text','File','Stego'].forEach(n=>$('tab'+n).classList.toggle('on',tb===n.toLowerCase()));
-  $('algoBox').style.display=(tb!=='file')?'grid':'none';
+  ['Text','File','Stego','Vault'].forEach(n=>$('tab'+n).classList.toggle('on',tb===n.toLowerCase()));
+  $('algoBox').style.display=(tb!=='file'&&tb!=='vault')?'grid':'none';$('modeBox').style.display=tb==='vault'?'none':'grid';$('pnlVault').style.display=tb==='vault'?'block':'none';
+  $('kdfBtn').style.display=NP()?'':'none';$('kdfBtn').textContent=t('a2')+': '+(S.kdf2?'ON':'OFF');
   $('aAuto').classList.toggle('on',S.algo==='auto');$('aClassic').classList.toggle('on',S.algo==='classic');$('aPk').classList.toggle('on',S.algo==='pk');
-  $('pkBox').style.display=(tb!=='file'&&S.algo==='pk')?'block':'none';$('pkRecipW').style.display=e?'block':'none';
-  $('legNote').style.display=(tb!=='file'&&S.algo==='classic')?'block':'none';
+  $('pkBox').style.display=(tb!=='file'&&tb!=='vault'&&S.algo==='pk')?'block':'none';$('pkRecipW').style.display=e?'block':'none';
+  $('legNote').style.display=(tb!=='file'&&tb!=='vault'&&S.algo==='classic')?'block':'none';
   $('pnlText').style.display=(tb==='text'||(tb==='stego'&&e))?'block':'none';
   $('pnlFile').style.display=tb==='file'?'block':'none';
   $('pnlStego').style.display=tb==='stego'?'block':'none';
   $('inLbl').textContent=tb==='stego'?t('hd'):(e?t('pl'):t('ci'));
   $('fileLbl').textContent=S.file?S.file.name:t('dz');
   $('stegoLbl').textContent=S.img?S.img.name+(S.cap?'  ·  '+t('cap')+' '+Math.max(0,Math.floor((S.cap-5)*3/4)-60)+' B':''):t('di');
-  if(!S.busy)$('mainBtn').textContent=e?t('en'):t('de');
+  if(!S.busy)$('mainBtn').textContent=tb==='vault'?t('vo'):(e?t('en'):t('de'));
   updateBtn();
 }
 function setMode(m){S.mode=m;S.out='';S.pend=null;$('outBox').style.display='none';refresh();}
 function updateBtn(){
   const k0=$('keyInp').value.trim(),x=$('txtInp').value.trim(),k=(S.algo==='pk'&&S.mode==='enc')?$('pkRecip').value.trim():k0;let ok;
-  if(S.tab==='text')ok=k&&x;else if(S.tab==='file')ok=k0&&S.file;else ok=k&&S.img&&(S.mode==='dec'||x);
+  if(S.tab==='vault')ok=k0;else if(S.tab==='text')ok=k&&x;else if(S.tab==='file')ok=k0&&S.file;else ok=k&&S.img&&(S.mode==='dec'||x);
   $('mainBtn').disabled=!ok||S.busy;
 }
 function onKey(){
@@ -522,6 +537,7 @@ function addHist(c){
 }
 const prog=f=>{$('progBar').style.width=Math.round(f*100)+'%';};
 async function go(){
+  if(S.tab==='vault')return vaultOpen($('keyInp').value);
   const key=$('keyInp').value;if(S.busy||(!key.trim()&&!(S.algo==='pk'&&S.mode==='enc'&&S.tab!=='file')))return;
   S.busy=true;S.ab={stop:false};S.pend=null;
   const isEnc=S.mode==='enc';
@@ -541,6 +557,69 @@ async function go(){
   $('outTxt').className='ot'+(err?' e':'');reveal($('outTxt'),res,err);
   if(!err){if(isEnc&&S.tab==='text')addHist(res);if(S.pend){$('saveBtn').style.display=$('shareBtn').style.display='';}}
   refresh();
+}
+/* ───── VAULT: encrypted files kept in app-private storage, names hidden in an encrypted index ───── */
+const V={key:'',idx:null};
+const FS=()=>window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Filesystem;
+const fmtB=n=>n<1024?n+' B':n<1048576?(n/1024).toFixed(1)+' KB':(n/1048576).toFixed(1)+' MB';
+async function vLoad(key){
+  const fs=FS();let ex=true;try{await fs.stat({path:'vault/index.cx',directory:'DATA'});}catch(e){ex=false;}
+  if(!ex)return[];
+  const raw=(await fs.readFile({path:'vault/index.cx',directory:'DATA',encoding:'utf8'})).data;
+  return JSON.parse(await decText(String(raw),key));
+}
+const vSave=async()=>FS().writeFile({path:'vault/index.cx',directory:'DATA',data:await encText(JSON.stringify(V.idx),V.key),encoding:'utf8',recursive:true});
+async function vaultOpen(key){
+  if(!key.trim())return;
+  if(!isNative()||!FS()){toast(t('vnat'));return;}
+  try{V.idx=await vLoad(key);V.key=key;}catch(e){V.idx=null;V.key='';toast(t('bad'));}
+  vRender();
+}
+async function vAdd(file){
+  const r=await encFile(file,V.key,prog,{stop:false}),fs=FS(),id=Array.from(rnd(8),b=>b.toString(16).padStart(2,'0')).join(''),path='vault/'+id+'.cx',B=3<<20;
+  try{
+    for(let o=0,i=0;;o+=B,i++){
+      const part=await toB64(r.blob.slice(o,o+B));
+      if(i===0)await fs.writeFile({path,directory:'DATA',data:part,recursive:true});else await fs.appendFile({path,directory:'DATA',data:part});
+      if(o+B>=r.blob.size)break;
+    }
+    V.idx.push({id,n:file.name,s:file.size,d:Date.now()});await vSave();
+  }catch(e){try{await fs.deleteFile({path,directory:'DATA'});}catch(x){}throw e;}
+}
+async function vAddMany(files){
+  if(!V.idx||S.busy||!files.length)return;
+  S.busy=true;$('prog').style.display='block';
+  try{for(const f of files){prog(0);await vAdd(f);}toast(t('vdone'));}catch(e){toast(t('sf'));}
+  S.busy=false;$('prog').style.display='none';vRender();
+}
+async function vExport(it){
+  if(S.busy)return;S.busy=true;$('prog').style.display='block';prog(0);
+  try{
+    const u=(await FS().getUri({path:'vault/'+it.id+'.cx',directory:'DATA'})).uri;
+    const b=await(await fetch(window.Capacitor.convertFileSrc(u))).blob();
+    const r=await decFile(new File([b],it.id),V.key,prog,{stop:false});
+    showOut(it.n+'  ('+fmtB(it.s)+')',t('od'));S.pend={blob:r.blob,name:r.name};$('saveBtn').style.display=$('shareBtn').style.display='';
+  }catch(e){toast(t('bad'));}
+  S.busy=false;$('prog').style.display='none';
+}
+async function vDelete(it){
+  try{await FS().deleteFile({path:'vault/'+it.id+'.cx',directory:'DATA'});}catch(e){}
+  V.idx=V.idx.filter(x=>x.id!==it.id);try{await vSave();}catch(e){toast(t('sf'));}vRender();
+}
+function vRender(){
+  const L0=$('vList');L0.textContent='';$('vBox').style.display=V.idx?'block':'none';
+  if(!V.idx)return;
+  $('vTot').textContent=V.idx.length+' · '+fmtB(V.idx.reduce((a,x)=>a+x.s,0))+' '+t('vtot');
+  if(!V.idx.length){const e=document.createElement('div');e.className='row';e.textContent=t('vemp');L0.appendChild(e);return;}
+  V.idx.slice().reverse().forEach(it=>{
+    const r=document.createElement('div');r.className='hi vi';
+    const n=document.createElement('span');n.textContent=it.n;n.dir='auto';
+    const m=document.createElement('span');m.textContent=fmtB(it.s);
+    const ex=document.createElement('button');ex.textContent=t('vexp');ex.onclick=()=>vExport(it);
+    const dl=document.createElement('button');dl.textContent=t('vdel');
+    dl.onclick=()=>{if(dl.dataset.s){vDelete(it);}else{dl.dataset.s='1';dl.textContent=t('vsure');setTimeout(()=>{dl.dataset.s='';dl.textContent=t('vdel');},3000);}};
+    r.append(n,m,ex,dl);L0.appendChild(r);
+  });
 }
 function showOut(txt,label){
   $('outBox').style.display='block';$('outLbl').className='ol';$('outLbl').textContent=label;$('outTxt').className='ot';reveal($('outTxt'),txt,false);
@@ -564,7 +643,7 @@ async function openIncoming(f){
   catch(e){toast(t('sf'));}
 }
 function clearAll(){
-  S.ab.stop=true;$('keyInp').value='';$('txtInp').value='';$('outBox').style.display='none';
+  S.ab.stop=true;V.key='';V.idx=null;vRender();$('keyInp').value='';$('txtInp').value='';$('outBox').style.display='none';
   S.out='';S.file=S.img=S.pend=null;$('fileInput').value=$('stegoInput').value='';onKey();onTxt();refresh();
 }
 function genKey(){$('keyInp').value=Array.from(rnd(16),b=>b.toString(16).padStart(2,'0')).join('');onKey();}
@@ -572,10 +651,12 @@ function doSwap(){if(!S.out||S.tab!=='text')return;$('txtInp').value=S.out;S.out
 
 window.addEventListener('DOMContentLoaded',()=>{
   setTheme(st('cx_theme')||'dark');
-  ['Text','File','Stego'].forEach(n=>$('tab'+n).addEventListener('click',()=>{S.tab=n.toLowerCase();refresh();}));
+  ['Text','File','Stego','Vault'].forEach(n=>$('tab'+n).addEventListener('click',()=>{S.tab=n.toLowerCase();refresh();}));
   $('bEnc').addEventListener('click',()=>setMode('enc'));$('bDec').addEventListener('click',()=>setMode('dec'));
   $('aAuto').addEventListener('click',()=>{S.algo='auto';refresh();});$('aClassic').addEventListener('click',()=>{S.algo='classic';refresh();});$('aPk').addEventListener('click',()=>{S.algo='pk';refresh();});
   $('pkRecip').addEventListener('input',updateBtn);$('pkGen').addEventListener('click',pkNew);$('pkShow').addEventListener('click',pkShow);$('qrBtn').addEventListener('click',doQR);
+  $('kdfBtn').addEventListener('click',()=>{S.kdf2=!S.kdf2;st('cx_k2',S.kdf2?'1':'0');refresh();});
+  $('vDrop').addEventListener('click',()=>$('vInput').click());$('vInput').addEventListener('change',e=>{vAddMany(Array.from(e.target.files));e.target.value='';});
   $('langB').addEventListener('click',()=>{lang=lang==='fa'?'en':'fa';st('cx_lang',lang);applyLang();});
   $('themeB').addEventListener('click',()=>{const m=document.documentElement.dataset.theme==='dark'?'light':'dark';st('cx_theme',m);setTheme(m);});
   $('eyeB').addEventListener('click',()=>{S.show=!S.show;$('keyInp').type=S.show?'text':'password';$('eyeB').textContent=S.show?'◎':'◉';});
@@ -590,6 +671,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   $('stegoInput').addEventListener('change',async e=>{S.img=e.target.files[0]||null;S.cap=0;if(S.img){try{const i=await loadImg(S.img);S.cap=Math.floor((i.width*i.height*3-56)/8);}catch(x){}}refresh();});
   document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();if(!$('mainBtn').disabled)go();}});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-S.lastShare>120000)sweepCache();});
+  S.kdf2=st('cx_k2')==='1';
   applyLang();sweepCache();bgStart();
   const np=NP();if(np){np.addListener('fileOpened',openIncoming);np.getOpenedFile().then(f=>{if(f&&f.path)openIncoming(f);}).catch(()=>{});}
 });
